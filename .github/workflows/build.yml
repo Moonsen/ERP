@@ -1,0 +1,100 @@
+name: Build and Package
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    tags: [ "v*" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Build Frontend
+        run: |
+          cd client
+          npm install
+          npm run build
+
+      - name: Prepare Deployment Package
+        run: |
+          mkdir -p deploy/server
+          mkdir -p deploy/client/dist
+          cp -R server/* deploy/server/
+          cp -R client/dist/* deploy/client/dist/
+          # Remove local dev files
+          rm -rf deploy/server/node_modules
+          rm -f deploy/server/warehouse.db
+          cd deploy
+          zip -r ../erp-web-deploy.zip .
+
+      - name: Upload Web Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: erp-web-deploy
+          path: erp-web-deploy.zip
+
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x android/gradlew
+
+      - name: Build with Gradle
+        run: |
+          cd android
+          ./gradlew assembleDebug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: erp-android-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+  release:
+    needs: [build-web, build-android]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Web Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: erp-web-deploy
+
+      - name: Download Android Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: erp-android-apk
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            erp-web-deploy.zip
+            app-debug.apk
+          body: |
+            跨境仓库发货管理系统 自动构建发布
+            - PC 端部署包 (ZIP)
+            - Android App 测试包 (APK)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

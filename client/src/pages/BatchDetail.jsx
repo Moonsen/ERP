@@ -1,0 +1,138 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Table, Button, Space, message, Modal, Form, InputNumber, Breadcrumb, Card, Descriptions } from 'antd';
+import { PlusOutlined, DeleteOutlined, ArrowRightOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import axios from 'axios';
+
+const BatchDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [batch, setBatch] = useState(null);
+  const [boxes, setBoxes] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [form] = Form.useForm();
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const batchRes = await axios.get(`/api/batches/${id}`);
+      setBatch(batchRes.data);
+
+      const boxesRes = await axios.get(`/api/boxes/${id}`);
+      setBoxes(boxesRes.data);
+    } catch (err) {
+      message.error('获取数据失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [id]);
+
+  const handleCreateBox = async (values) => {
+    try {
+      await axios.post('/api/boxes', { ...values, batch_id: id });
+      message.success('添加箱子成功');
+      setIsModalVisible(false);
+      form.resetFields();
+      fetchData();
+    } catch (err) {
+      message.error('添加失败');
+    }
+  };
+
+  const handleDeleteBox = (boxId) => {
+    Modal.confirm({
+      title: '确认删除',
+      content: '确定要删除这个箱子吗？',
+      onOk: async () => {
+        try {
+          await axios.delete(`/api/boxes/${boxId}`);
+          message.success('删除成功');
+          fetchData();
+        } catch (err) {
+          message.error('删除失败');
+        }
+      },
+    });
+  };
+
+  const columns = [
+    { title: '箱号', dataIndex: 'box_number', key: 'box_number', render: (num) => `第 ${num} 箱` },
+    {
+      title: '尺寸 (cm)',
+      key: 'dimensions',
+      render: (_, record) => `${record.length_cm} x ${record.width_cm} x ${record.height_cm}`
+    },
+    { title: '重量 (kg)', dataIndex: 'weight_kg', key: 'weight_kg' },
+    {
+      title: '操作',
+      key: 'action',
+      render: (_, record) => (
+        <Space size="middle">
+          <Button icon={<ArrowRightOutlined />} onClick={() => navigate(`/boxes/${record.id}`)}>装箱明细</Button>
+          <Button icon={<DeleteOutlined />} danger size="small" onClick={() => handleDeleteBox(record.id)}>删除</Button>
+        </Space>
+      ),
+    },
+  ];
+
+  if (!batch) return <div>加载中...</div>;
+
+  return (
+    <div>
+      <Breadcrumb style={{ marginBottom: 16 }}>
+        <Breadcrumb.Item><a onClick={() => navigate('/batches')}>批次列表</a></Breadcrumb.Item>
+        <Breadcrumb.Item>{batch.name}</Breadcrumb.Item>
+      </Breadcrumb>
+
+      <Card style={{ marginBottom: 16 }}>
+        <Descriptions title="批次信息" bordered size="small">
+          <Descriptions.Item label="批次名称">{batch.name}</Descriptions.Item>
+          <Descriptions.Item label="目的地">{batch.destination || '未设置'}</Descriptions.Item>
+          <Descriptions.Item label="备注">{batch.remark || '无'}</Descriptions.Item>
+        </Descriptions>
+      </Card>
+
+      <div style={{ marginBottom: 16, textAlign: 'right' }}>
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>添加箱子</Button>
+      </div>
+
+      <Table
+        columns={columns}
+        dataSource={boxes}
+        rowKey="id"
+        loading={loading}
+      />
+
+      <Modal
+        title="添加箱子"
+        open={isModalVisible}
+        onOk={() => form.submit()}
+        onCancel={() => setIsModalVisible(false)}
+      >
+        <Form form={form} layout="vertical" onFinish={handleCreateBox} initialValues={{ length_cm: 50, width_cm: 40, height_cm: 30, weight_kg: 10 }}>
+          <Space>
+            <Form.Item name="length_cm" label="长 (cm)" rules={[{ required: true }]}>
+              <InputNumber min={0.1} />
+            </Form.Item>
+            <Form.Item name="width_cm" label="宽 (cm)" rules={[{ required: true }]}>
+              <InputNumber min={0.1} />
+            </Form.Item>
+            <Form.Item name="height_cm" label="高 (cm)" rules={[{ required: true }]}>
+              <InputNumber min={0.1} />
+            </Form.Item>
+          </Space>
+          <Form.Item name="weight_kg" label="重量 (kg)" rules={[{ required: true }]}>
+            <InputNumber min={0.1} step={0.1} style={{ width: '100%' }} />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
+  );
+};
+
+export default BatchDetail;
