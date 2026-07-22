@@ -79,7 +79,7 @@ fun DataManageScreen(navController: NavController) {
                             onClick = { /* Save Config Logic */ },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Icon(Icons.Filled.CloudUpload, contentDescription = null)
+                            Icon(Icons.Default.CloudUpload, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("保存配置")
                         }
@@ -88,7 +88,7 @@ fun DataManageScreen(navController: NavController) {
                             onClick = { /* Trigger Sync */ },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Icon(Icons.Filled.CloudDownload, contentDescription = null)
+                            Icon(Icons.Default.CloudDownload, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("立即同步")
                         }
@@ -97,7 +97,7 @@ fun DataManageScreen(navController: NavController) {
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            HorizontalDivider()
+            Divider()
             Spacer(modifier = Modifier.height(16.dp))
 
             Card(modifier = Modifier.fillMaxWidth()) {
@@ -116,7 +116,7 @@ fun DataManageScreen(navController: NavController) {
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
-                        Icon(Icons.Filled.CloudUpload, contentDescription = null)
+                        Icon(Icons.Default.CloudUpload, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("恢复备份")
                     }
