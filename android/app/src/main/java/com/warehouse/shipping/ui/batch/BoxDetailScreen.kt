@@ -70,6 +70,10 @@ fun BoxDetailScreen(
                 onProductSelected = { selected, qty ->
                     // Save logic
                     showPickerDialog = false
+                },
+                onManualInput = { name, barcode, l, w, h, weight, qty ->
+                    // Save logic
+                    showPickerDialog = false
                 }
             )
         }

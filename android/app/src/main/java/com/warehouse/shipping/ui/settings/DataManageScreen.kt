@@ -79,7 +79,7 @@ fun DataManageScreen(navController: NavController) {
                             onClick = { /* Save Config Logic */ },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Icon(Icons.Default.CloudUpload, contentDescription = null)
+                            Icon(Icons.Filled.CloudUpload, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("保存配置")
                         }
@@ -88,7 +88,7 @@ fun DataManageScreen(navController: NavController) {
                             onClick = { /* Trigger Sync */ },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Icon(Icons.Default.CloudDownload, contentDescription = null)
+                            Icon(Icons.Filled.CloudDownload, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("立即同步")
                         }
@@ -97,8 +97,10 @@ fun DataManageScreen(navController: NavController) {
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            Divider()
+            HorizontalDivider()
             Spacer(modifier = Modifier.height(16.dp))
+
+            Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("本地备份与恢复", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(16.dp))
@@ -114,7 +116,7 @@ fun DataManageScreen(navController: NavController) {
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
-                        Icon(Icons.Default.CloudUpload, contentDescription = null)
+                        Icon(Icons.Filled.CloudUpload, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("恢复备份")
                     }
