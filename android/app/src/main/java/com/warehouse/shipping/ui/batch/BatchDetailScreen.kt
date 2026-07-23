@@ -21,9 +21,14 @@ import com.warehouse.shipping.ui.navigation.Screen
 fun BatchDetailScreen(
     navController: NavController,
     batchId: String,
-    batch: BatchEntity?,
-    boxes: List<BoxEntity>
+    viewModel: BatchViewModel
 ) {
+    val batches by viewModel.batches.collectAsState(initial = emptyList())
+    val batch = batches.find { it.id == batchId }
+    val boxes by viewModel.getBoxes(batchId).collectAsState(initial = emptyList())
+    
+    var showAddBoxDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -36,7 +41,7 @@ fun BatchDetailScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { /* Add Box Dialog */ }) {
+            FloatingActionButton(onClick = { showAddBoxDialog = true }) {
                 Icon(Icons.Default.Add, contentDescription = "Add Box")
             }
         }
@@ -62,6 +67,21 @@ fun BatchDetailScreen(
                     )
                 }
             }
+        }
+
+        if (showAddBoxDialog) {
+            // Simplified Add Box Dialog
+            AlertDialog(
+                onDismissRequest = { showAddBoxDialog = false },
+                title = { Text("添加箱子") },
+                text = { Text("确认添加一个新的空箱？规格默认 50x40x30cm") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        viewModel.addBox(batchId, 50.0, 40.0, 30.0, 0.0)
+                        showAddBoxDialog = false
+                    }) { Text("添加") }
+                }
+            )
         }
     }
 }

@@ -1,8 +1,11 @@
-const { createClient } = require('webdav');
-
 let client = null;
 
-function initClient(url, username, password) {
+async function getWebDAV() {
+  return await import('webdav');
+}
+
+async function initClient(url, username, password) {
+  const { createClient } = await getWebDAV();
   client = createClient(url, {
     username: username,
     password: password
@@ -16,7 +19,6 @@ function isInitialized() {
 
 function getClient() {
   if (!client) {
-    // In a real app, load from config or env
     throw new Error('WebDAV client not initialized');
   }
   return client;
@@ -38,6 +40,7 @@ async function downloadFile(remotePath) {
 
 module.exports = {
   initClient,
+  isInitialized,
   getClient,
   uploadFile,
   downloadFile

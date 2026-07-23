@@ -21,18 +21,20 @@ const syncRoutes = require('./routes/sync');
 
 // Auto-initialize WebDAV if config exists
 const webdavClient = require('./sync/webdav-client');
-try {
-  const url = db.prepare('SELECT value FROM config WHERE key = ?').get('webdav_url')?.value;
-  const username = db.prepare('SELECT value FROM config WHERE key = ?').get('webdav_username')?.value;
-  const password = db.prepare('SELECT value FROM config WHERE key = ?').get('webdav_password')?.value;
+(async () => {
+  try {
+    const url = db.prepare('SELECT value FROM config WHERE key = ?').get('webdav_url')?.value;
+    const username = db.prepare('SELECT value FROM config WHERE key = ?').get('webdav_username')?.value;
+    const password = db.prepare('SELECT value FROM config WHERE key = ?').get('webdav_password')?.value;
 
-  if (url && username && password) {
-    webdavClient.initClient(url, username, password);
-    console.log('WebDAV client auto-initialized from database');
+    if (url && username && password) {
+      await webdavClient.initClient(url, username, password);
+      console.log('WebDAV client auto-initialized from database');
+    }
+  } catch (err) {
+    console.error('Failed to auto-initialize WebDAV:', err.message);
   }
-} catch (err) {
-  console.error('Failed to auto-initialize WebDAV:', err.message);
-}
+})();
 
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/batches', batchRoutes);

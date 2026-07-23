@@ -38,8 +38,11 @@ const App = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider breakpoint="lg" collapsedWidth="0">
-        <div style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)', color: '#fff', textAlign: 'center', lineHeight: '32px', fontWeight: 'bold' }}>
-          ERP 系统
+        <div style={{ padding: '16px', textAlign: 'center' }}>
+          <img src="/logo.svg" alt="Logo" style={{ width: '48px', marginBottom: '8px' }} />
+          <div style={{ color: '#fff', fontSize: '16px', fontWeight: 'bold' }}>
+            仓库管理系统
+          </div>
         </div>
         <Menu theme="dark" mode="inline" selectedKeys={[location.pathname]} items={menuItems} />
       </Sider>

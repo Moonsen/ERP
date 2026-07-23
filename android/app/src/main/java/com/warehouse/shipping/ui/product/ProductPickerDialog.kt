@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -20,7 +20,8 @@ fun ProductPickerDialog(
     inventory: List<ProductInventoryEntity>,
     onDismiss: () -> Unit,
     onProductSelected: (ProductInventoryEntity, Int) -> Unit,
-    onManualInput: (String, String?, Double, Double, Double, Double, Int) -> Unit
+    onManualInput: (String, String?, Double, Double, Double, Double, Int) -> Unit,
+    onScanRequest: () -> Unit = {} // Added Scan Request
 ) {
     var activeTab by remember { mutableStateOf(0) } // 0: Select, 1: Manual
     var searchQuery by remember { mutableStateOf("") }
@@ -60,6 +61,11 @@ fun ProductPickerDialog(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         placeholder = { Text("搜索产品...") },
+                        trailingIcon = { 
+                            IconButton(onClick = onScanRequest) { 
+                                Icon(Icons.Default.PhotoCamera, contentDescription = "Scan") 
+                            }
+                        },
                         modifier = Modifier.fillMaxWidth()
                     )
                     LazyColumn(modifier = Modifier.weight(1f)) {

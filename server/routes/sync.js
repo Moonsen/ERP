@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const db = require('../db');
 const syncService = require('../sync/sync-service');
 const webdavClient = require('../sync/webdav-client');
 
@@ -22,7 +23,7 @@ router.get('/config', (req, res) => {
 });
 
 // Save config
-router.post('/config', (req, res) => {
+router.post('/config', async (req, res) => {
   const { url, username, password } = req.body;
   try {
     const upsert = db.prepare('INSERT INTO config (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value');
@@ -34,7 +35,7 @@ router.post('/config', (req, res) => {
     }
 
     // Re-initialize client
-    webdavClient.initClient(url, username, (password && password !== '********') ? password : getStoredPassword());
+    await webdavClient.initClient(url, username, (password && password !== '********') ? password : getStoredPassword());
 
     res.json({ success: true, message: '配置已保存' });
   } catch (err) {

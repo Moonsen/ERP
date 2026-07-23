@@ -15,6 +15,9 @@ import androidx.navigation.NavController
 import com.warehouse.shipping.data.local.entity.ProductInventoryEntity
 import com.warehouse.shipping.ui.navigation.Screen
 
+import androidx.compose.ui.res.painterResource
+import com.warehouse.shipping.R
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InventoryListScreen(
@@ -26,7 +29,20 @@ fun InventoryListScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("产品库") })
+            TopAppBar(
+                title = { 
+                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_logo),
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("产品库")
+                    }
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { navController.navigate(Screen.InventoryEdit.createRoute("new")) }) {

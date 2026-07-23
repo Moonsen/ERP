@@ -6,6 +6,22 @@ const upload = multer();
 
 const MACHINE_ID = 'local-web-server';
 
+// Get backup info
+router.get('/info', (req, res) => {
+  try {
+    const counts = {
+      batches: db.prepare('SELECT COUNT(*) as count FROM batch WHERE deleted_at IS NULL').get().count,
+      boxes: db.prepare('SELECT COUNT(*) as count FROM box WHERE deleted_at IS NULL').get().count,
+      inventory: db.prepare('SELECT COUNT(*) as count FROM product_inventory WHERE deleted_at IS NULL').get().count,
+      boxProducts: db.prepare('SELECT COUNT(*) as count FROM box_product WHERE deleted_at IS NULL').get().count
+    };
+    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+    res.json({ counts, total });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Export backup
 router.get('/export', (req, res) => {
   try {

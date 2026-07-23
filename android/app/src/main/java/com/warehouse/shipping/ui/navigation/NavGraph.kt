@@ -25,29 +25,41 @@ sealed class Screen(val route: String) {
     object Settings : Screen("settings")
 }
 
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.warehouse.shipping.ui.inventory.InventoryListScreen
+import com.warehouse.shipping.ui.inventory.InventoryListViewModel
+import com.warehouse.shipping.ui.inventory.InventoryEditViewModel
+import com.warehouse.shipping.ui.batch.viewmodel.BatchViewModel
+
 @Composable
-fun NavGraph(navController: NavHostController) {
+fun NavGraph(navController: NavHostController, factory: ViewModelProvider.Factory) {
     NavHost(
         navController = navController,
         startDestination = Screen.BatchList.route
     ) {
         composable(Screen.InventoryList.route) {
-            // InventoryListScreen(navController, viewModel)
+            val vm: InventoryListViewModel = viewModel(factory = factory)
+            InventoryListScreen(navController, vm)
         }
         composable(Screen.InventoryEdit.route) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id")
-            InventoryEditScreen(navController, id)
+            val vm: InventoryEditViewModel = viewModel(factory = factory)
+            InventoryEditScreen(navController, vm, id)
         }
         composable(Screen.BatchList.route) {
-            BatchListScreen(navController, emptyList())
+            val vm: BatchViewModel = viewModel(factory = factory)
+            BatchListScreen(navController, vm)
         }
         composable(Screen.BatchDetail.route) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id")
-            BatchDetailScreen(navController, id ?: "", null, emptyList())
+            val vm: BatchViewModel = viewModel(factory = factory)
+            BatchDetailScreen(navController, id ?: "", vm)
         }
         composable(Screen.BoxDetail.route) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id")
-            BoxDetailScreen(navController, id ?: "", null, emptyList())
+            val vm: BatchViewModel = viewModel(factory = factory)
+            BoxDetailScreen(navController, id ?: "", vm)
         }
         composable(Screen.Settings.route) {
             DataManageScreen(navController)

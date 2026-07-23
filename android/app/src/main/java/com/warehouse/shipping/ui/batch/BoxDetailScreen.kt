@@ -20,9 +20,13 @@ import com.warehouse.shipping.ui.product.ProductPickerDialog
 fun BoxDetailScreen(
     navController: NavController,
     boxId: String,
-    box: BoxEntity?,
-    products: List<BoxProductEntity>
+    viewModel: BatchViewModel
 ) {
+    val boxes by viewModel.getBoxes("").collectAsState(initial = emptyList()) // This needs a proper box lookup
+    val box = boxes.find { it.id == boxId }
+    val products by viewModel.getProducts(boxId).collectAsState(initial = emptyList())
+    val inventory by viewModel.allInventory.collectAsState(initial = emptyList())
+
     var showPickerDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -65,14 +69,15 @@ fun BoxDetailScreen(
 
         if (showPickerDialog) {
             ProductPickerDialog(
-                inventory = emptyList(), // Should be passed from ViewModel
+                inventory = inventory,
                 onDismiss = { showPickerDialog = false },
                 onProductSelected = { selected, qty ->
-                    // Save logic
+                    viewModel.addProduct(boxId, selected, selected.name, selected.barcode, 
+                        selected.length_cm, selected.width_cm, selected.height_cm, selected.weight_g, qty)
                     showPickerDialog = false
                 },
                 onManualInput = { name, barcode, l, w, h, weight, qty ->
-                    // Save logic
+                    viewModel.addProduct(boxId, null, name, barcode, l, w, h, weight, qty)
                     showPickerDialog = false
                 }
             )

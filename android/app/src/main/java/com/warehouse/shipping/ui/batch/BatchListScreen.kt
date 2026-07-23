@@ -18,14 +18,18 @@ import com.warehouse.shipping.ui.navigation.Screen
 @Composable
 fun BatchListScreen(
     navController: NavController,
-    batches: List<BatchEntity> // Assume passed from ViewModel
+    viewModel: BatchViewModel
 ) {
+    val batches by viewModel.batches.collectAsState(initial = emptyList())
+    var showAddDialog by remember { mutableStateOf(false) }
+    var newBatchName by remember { mutableStateOf("") }
+
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("发货批次") })
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { /* Add Batch Dialog */ }) {
+            FloatingActionButton(onClick = { showAddDialog = true }) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
         }
@@ -41,6 +45,26 @@ fun BatchListScreen(
                     }
                 )
             }
+        }
+
+        if (showAddDialog) {
+            AlertDialog(
+                onDismissRequest = { showAddDialog = false },
+                title = { Text("新建批次") },
+                text = {
+                    OutlinedTextField(
+                        value = newBatchName,
+                        onValueChange = { newBatchName = it },
+                        label = { Text("批次名称") }
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        viewModel.createBatch(newBatchName, null)
+                        showAddDialog = false
+                    }) { Text("确定") }
+                }
+            )
         }
     }
 }

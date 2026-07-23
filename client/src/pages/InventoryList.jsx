@@ -53,6 +53,18 @@ const InventoryList = () => {
     },
     { title: '重量 (g)', dataIndex: 'weight_g', key: 'weight_g' },
     {
+      title: '规格数',
+      key: 'specs_count',
+      render: (_, record) => {
+        try {
+          const specs = JSON.parse(record.custom_specs || '[]');
+          return specs.length;
+        } catch (e) {
+          return 0;
+        }
+      }
+    },
+    {
       title: '操作',
       key: 'action',
       render: (_, record) => (

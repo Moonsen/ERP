@@ -8,10 +8,21 @@ const { Title, Paragraph } = Typography;
 const DataManage = () => {
   const [loading, setLoading] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
+  const [stats, setStats] = useState({ total: 0, counts: {} });
   const [configForm] = Form.useForm();
 
+  const fetchStats = async () => {
+    try {
+      const res = await axios.get('/api/backup/info');
+      setStats(res.data);
+    } catch (err) {
+      console.error('Failed to fetch stats');
+    }
+  };
+
   useEffect(() => {
-    const fetchConfig = async () => {
+    fetchStats();
+    // ... config loading logic
       try {
         const res = await axios.get('/api/sync/config');
         configForm.setFieldsValue({
@@ -119,6 +130,9 @@ const DataManage = () => {
       <Card title="本地数据备份" style={{ marginBottom: 24 }}>
         <Paragraph>
           将系统内所有数据（产品库、发货批次、箱子明细）导出为 JSON 文件，用于本地存档或数据迁移。
+        </Paragraph>
+        <Paragraph type="secondary">
+          当前系统内共有 <Typography.Text strong>{stats.total}</Typography.Text> 条有效记录。
         </Paragraph>
         <Button type="primary" icon={<DownloadOutlined />} onClick={handleExport}>
           导出备份
