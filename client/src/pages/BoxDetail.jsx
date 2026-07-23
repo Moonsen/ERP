@@ -50,6 +50,10 @@ const BoxDetail = () => {
         if (activeTab === '1') {
           // From Inventory
           const item = inventory.find(i => i.id === values.inventory_id);
+          if (!item) {
+            message.error('请选择产品');
+            return;
+          }
           payload = {
             box_id: id,
             inventory_id: item.id,
@@ -156,7 +160,12 @@ const BoxDetail = () => {
       </Card>
 
       <div style={{ marginBottom: 16, textAlign: 'right' }}>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>添加产品</Button>
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => {
+          setEditingProduct(null);
+          form.resetFields();
+          setActiveTab('1');
+          setIsModalVisible(true);
+        }}>添加产品</Button>
       </div>
 
       <Table
@@ -176,12 +185,17 @@ const BoxDetail = () => {
           form.resetFields();
         }}
         width={600}
+        destroyOnClose
       >
-        <Tabs activeKey={activeTab} onChange={setActiveTab}>
-          {!editingProduct && (
-            <TabPane tab="从产品库选择" key="1">
-              <Form form={form} layout="vertical" onFinish={handleSaveProduct}>
-                <Form.Item name="inventory_id" label="选择产品" rules={[{ required: true }]}>
+        <Form form={form} layout="vertical" onFinish={handleSaveProduct} preserve={false}>
+          <Tabs activeKey={activeTab} onChange={setActiveTab}>
+            {!editingProduct && (
+              <TabPane tab="从产品库选择" key="1">
+                <Form.Item
+                  name="inventory_id"
+                  label="选择产品"
+                  rules={[{ required: activeTab === '1', message: '请选择产品' }]}
+                >
                   <Select
                     showSearch
                     placeholder="搜索名称/编码/条形码"
@@ -195,40 +209,66 @@ const BoxDetail = () => {
                     }))}
                   />
                 </Form.Item>
-                <Form.Item name="quantity" label="数量" rules={[{ required: true }]}>
+                <Form.Item
+                  name="quantity"
+                  label="数量"
+                  rules={[{ required: activeTab === '1', message: '请输入数量' }]}
+                >
                   <InputNumber min={1} style={{ width: '100%' }} />
                 </Form.Item>
-              </Form>
-            </TabPane>
-          )}
-          <TabPane tab={editingProduct ? "产品信息" : "手动输入"} key="2">
-            <Form form={form} layout="vertical" onFinish={handleSaveProduct}>
-              <Form.Item name="name" label="产品名称" rules={[{ required: true }]}>
+              </TabPane>
+            )}
+            <TabPane tab={editingProduct ? "产品信息" : "手动输入"} key="2">
+              <Form.Item
+                name="name"
+                label="产品名称"
+                rules={[{ required: activeTab === '2', message: '请输入产品名称' }]}
+              >
                 <Input />
               </Form.Item>
               <Form.Item name="barcode" label="条形码">
                 <Input />
               </Form.Item>
               <Space>
-                <Form.Item name="length_cm" label="长 (cm)" rules={[{ required: true }]}>
-                  <InputNumber min={0.1} />
+                <Form.Item
+                  name="length_cm"
+                  label="长 (cm)"
+                  rules={[{ required: activeTab === '2', message: '必填' }]}
+                >
+                  <InputNumber min={0.01} precision={2} />
                 </Form.Item>
-                <Form.Item name="width_cm" label="宽 (cm)" rules={[{ required: true }]}>
-                  <InputNumber min={0.1} />
+                <Form.Item
+                  name="width_cm"
+                  label="宽 (cm)"
+                  rules={[{ required: activeTab === '2', message: '必填' }]}
+                >
+                  <InputNumber min={0.01} precision={2} />
                 </Form.Item>
-                <Form.Item name="height_cm" label="高 (cm)" rules={[{ required: true }]}>
-                  <InputNumber min={0.1} />
+                <Form.Item
+                  name="height_cm"
+                  label="高 (cm)"
+                  rules={[{ required: activeTab === '2', message: '必填' }]}
+                >
+                  <InputNumber min={0.01} precision={2} />
                 </Form.Item>
               </Space>
-              <Form.Item name="weight_g" label="重量 (g)" rules={[{ required: true }]}>
+              <Form.Item
+                name="weight_g"
+                label="重量 (g)"
+                rules={[{ required: activeTab === '2', message: '请输入重量' }]}
+              >
+                <InputNumber min={0.01} precision={2} style={{ width: '100%' }} />
+              </Form.Item>
+              <Form.Item
+                name="quantity"
+                label="数量"
+                rules={[{ required: activeTab === '2', message: '请输入数量' }]}
+              >
                 <InputNumber min={1} style={{ width: '100%' }} />
               </Form.Item>
-              <Form.Item name="quantity" label="数量" rules={[{ required: true }]}>
-                <InputNumber min={1} style={{ width: '100%' }} />
-              </Form.Item>
-            </Form>
-          </TabPane>
-        </Tabs>
+            </TabPane>
+          </Tabs>
+        </Form>
       </Modal>
     </div>
   );
