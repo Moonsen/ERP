@@ -14,6 +14,8 @@ import BatchDetail from './pages/BatchDetail';
 import BoxDetail from './pages/BoxDetail';
 import DataManage from './pages/DataManage';
 
+const { Header, Content, Sider } = Layout;
+
 const App = () => {
   const location = useLocation();
 
