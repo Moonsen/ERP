@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Space, message, Modal, Form, Input } from 'antd';
-import { PlusOutlined, DeleteOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, ArrowRightOutlined, EditOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 

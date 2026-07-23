@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Table, Button, Space, message, Modal, Form, InputNumber, Breadcrumb, Card, Descriptions, Typography } from 'antd';
-import { PlusOutlined, DeleteOutlined, ArrowRightOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, ArrowRightOutlined, ArrowLeftOutlined, EditOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 const BatchDetail = () => {
