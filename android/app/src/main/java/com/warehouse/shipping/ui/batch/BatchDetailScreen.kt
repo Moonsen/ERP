@@ -7,19 +7,19 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.warehouse.shipping.data.local.entity.BatchEntity
 import com.warehouse.shipping.data.local.entity.BoxEntity
-import com.warehouse.shipping.ui.navigation.Screen
 import com.warehouse.shipping.ui.batch.viewmodel.BatchViewModel
 import com.warehouse.shipping.ui.components.ClickToCopyText
-
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Delete
+import com.warehouse.shipping.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,7 +78,7 @@ fun BatchDetailScreen(
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Column {
                             Text("总重量", style = MaterialTheme.typography.labelSmall)
-                            Text("${String.format("%.2f", totalWeight)} kg", color = MaterialTheme.colorScheme.secondary, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                            Text("${String.format("%.2f", totalWeight)} kg", color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
                         }
                         Column {
                             Text("总体积 (cm³)", style = MaterialTheme.typography.labelSmall)
@@ -86,7 +86,7 @@ fun BatchDetailScreen(
                         }
                         Column {
                             Text("总体积 (m³)", style = MaterialTheme.typography.labelSmall)
-                            Text(String.format("%.2f", totalVolumeM3), color = MaterialTheme.colorScheme.error, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                            Text(String.format("%.2f", totalVolumeM3), color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
