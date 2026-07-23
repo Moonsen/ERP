@@ -2,6 +2,7 @@ package com.warehouse.shipping.util
 
 import android.content.Context
 import android.net.Uri
+import androidx.room.withTransaction
 import com.warehouse.shipping.data.local.AppDatabase
 import com.warehouse.shipping.sync.SyncData
 import kotlinx.serialization.encodeToString
@@ -41,13 +42,12 @@ class BackupManager(private val db: AppDatabase, private val context: Context) {
             val jsonString = context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
             if (jsonString != null) {
                 val data = json.decodeFromString<SyncData>(jsonString)
-                db.runInTransaction {
+                db.withTransaction {
                     // Physical delete all business data as per spec 5.3
-                    // We don't clear the 'config' table to keep WebDAV settings
-                    db.query("DELETE FROM box_product", null)
-                    db.query("DELETE FROM product_inventory", null)
-                    db.query("DELETE FROM box", null)
-                    db.query("DELETE FROM batch", null)
+                    db.query("DELETE FROM box_product", null).close()
+                    db.query("DELETE FROM product_inventory", null).close()
+                    db.query("DELETE FROM box", null).close()
+                    db.query("DELETE FROM batch", null).close()
 
                     // Batch insert everything
                     data.batches.forEach { db.batchDao().insert(it) }

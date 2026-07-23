@@ -1,18 +1,5 @@
 package com.warehouse.shipping.ui.settings
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CloudDownload
-import androidx.compose.material.icons.filled.CloudUpload
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -163,6 +150,8 @@ fun DataManageScreen(navController: NavController, viewModel: SettingsViewModel)
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
+                        Icon(Icons.Default.CloudUpload, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text("恢复备份")
                     }
                 }
@@ -183,32 +172,6 @@ fun DataManageScreen(navController: NavController, viewModel: SettingsViewModel)
                         colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                     ) {
                         Text("选择备份文件并恢复")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showRestoreConfirm = false }) {
-                        Text("取消")
-                    }
-                }
-            )
-        }
-    }
-}
-
-        if (showRestoreConfirm) {
-            AlertDialog(
-                onDismissRequest = { showRestoreConfirm = false },
-                title = { Text("确认恢复数据？") },
-                text = { Text("恢复操作将清空当前所有本地数据，并替换为备份文件中的内容。建议先进行备份。") },
-                confirmButton = {
-                    TextButton(
-                        onClick = { 
-                            showRestoreConfirm = false 
-                            /* Restore Logic */
-                        },
-                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                    ) {
-                        Text("确认恢复")
                     }
                 },
                 dismissButton = {

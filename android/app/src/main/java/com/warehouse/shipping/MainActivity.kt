@@ -3,7 +3,6 @@ package com.warehouse.shipping
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -17,6 +16,7 @@ import com.warehouse.shipping.data.repository.WarehouseRepository
 import com.warehouse.shipping.ui.navigation.NavGraph
 import com.warehouse.shipping.ui.inventory.*
 import com.warehouse.shipping.ui.batch.viewmodel.BatchViewModel
+import com.warehouse.shipping.ui.settings.SettingsViewModel
 
 import androidx.activity.result.contract.ActivityResultContracts
 import android.Manifest
@@ -24,6 +24,13 @@ import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 
 class MainActivity : ComponentActivity() {
+    private val db by lazy {
+        Room.databaseBuilder(applicationContext, AppDatabase::class.java, "warehouse.db")
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+    private val repository by lazy { WarehouseRepository(db) }
+
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -47,6 +54,7 @@ class MainActivity : ComponentActivity() {
                     modelClass.isAssignableFrom(InventoryListViewModel::class.java) -> InventoryListViewModel(repository) as T
                     modelClass.isAssignableFrom(InventoryEditViewModel::class.java) -> InventoryEditViewModel(repository) as T
                     modelClass.isAssignableFrom(BatchViewModel::class.java) -> BatchViewModel(repository) as T
+                    modelClass.isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(repository, db, applicationContext) as T
                     else -> throw IllegalArgumentException("Unknown ViewModel")
                 }
             }

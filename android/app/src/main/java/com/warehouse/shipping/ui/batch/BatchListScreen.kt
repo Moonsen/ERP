@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.warehouse.shipping.data.local.entity.BatchEntity
 import com.warehouse.shipping.ui.navigation.Screen
+import com.warehouse.shipping.ui.batch.viewmodel.BatchViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

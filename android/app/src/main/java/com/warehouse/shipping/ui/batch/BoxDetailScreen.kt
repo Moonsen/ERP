@@ -14,6 +14,7 @@ import androidx.navigation.NavController
 import com.warehouse.shipping.data.local.entity.BoxEntity
 import com.warehouse.shipping.data.local.entity.BoxProductEntity
 import com.warehouse.shipping.ui.product.ProductPickerDialog
+import com.warehouse.shipping.ui.batch.viewmodel.BatchViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

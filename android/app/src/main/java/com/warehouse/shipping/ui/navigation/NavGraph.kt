@@ -10,6 +10,14 @@ import com.warehouse.shipping.ui.batch.BatchDetailScreen
 import com.warehouse.shipping.ui.batch.BoxDetailScreen
 import com.warehouse.shipping.ui.settings.DataManageScreen
 
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.warehouse.shipping.ui.inventory.InventoryListScreen
+import com.warehouse.shipping.ui.inventory.InventoryListViewModel
+import com.warehouse.shipping.ui.inventory.InventoryEditViewModel
+import com.warehouse.shipping.ui.batch.viewmodel.BatchViewModel
+import com.warehouse.shipping.ui.settings.SettingsViewModel
+
 sealed class Screen(val route: String) {
     object InventoryList : Screen("inventory_list")
     object InventoryEdit : Screen("inventory_edit/{id}") {
@@ -24,13 +32,6 @@ sealed class Screen(val route: String) {
     }
     object Settings : Screen("settings")
 }
-
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.warehouse.shipping.ui.inventory.InventoryListScreen
-import com.warehouse.shipping.ui.inventory.InventoryListViewModel
-import com.warehouse.shipping.ui.inventory.InventoryEditViewModel
-import com.warehouse.shipping.ui.batch.viewmodel.BatchViewModel
 
 @Composable
 fun NavGraph(navController: NavHostController, factory: ViewModelProvider.Factory) {
@@ -62,7 +63,8 @@ fun NavGraph(navController: NavHostController, factory: ViewModelProvider.Factor
             BoxDetailScreen(navController, id ?: "", vm)
         }
         composable(Screen.Settings.route) {
-            DataManageScreen(navController)
+            val vm: SettingsViewModel = viewModel(factory = factory)
+            DataManageScreen(navController, vm)
         }
     }
 }
