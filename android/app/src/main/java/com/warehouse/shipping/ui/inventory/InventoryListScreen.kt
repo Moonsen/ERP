@@ -94,17 +94,83 @@ fun InventoryListScreen(
     }
 }
 
+import androidx.compose.material.icons.filled.Straighten
+import androidx.compose.material.icons.filled.Scale
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
+
 @Composable
 fun ProductItem(product: ProductInventoryEntity, onClick: () -> Unit) {
-    ListItem(
-        headlineContent = { Text(product.name) },
-        supportingContent = { 
-            ClickToCopyText(
-                text = "${product.length_cm}x${product.width_cm}x${product.height_cm}cm | ${product.weight_g}g"
-            )
-        },
-        overlineContent = { product.product_code?.let { Text(it) } },
-        trailingContent = { product.barcode?.let { Text(it) } },
-        modifier = Modifier.clickable { onClick() }
-    )
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = product.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1E293B)
+                )
+                product.product_code?.let {
+                    Surface(
+                        color = Color(0xFFF1F5F9),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp)
+                    ) {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            color = Color(0xFF64748B)
+                        )
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            Row(modifier = Modifier.fillMaxWidth()) {
+                InfoTag(icon = Icons.Default.Straighten, text = "${product.length_cm}x${product.width_cm}x${product.height_cm} cm")
+                Spacer(modifier = Modifier.width(16.dp))
+                InfoTag(icon = Icons.Default.Scale, text = "${product.weight_g} g")
+            }
+
+            if (!product.barcode.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "SN: ${product.barcode}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color(0xFF94A3B8)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun InfoTag(icon: ImageVector, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(14.dp),
+            tint = Color(0xFF2563EB)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        ClickToCopyText(
+            text = text,
+            style = MaterialTheme.typography.bodySmall.copy(color = Color(0xFF64748B))
+        )
+    }
 }

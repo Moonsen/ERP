@@ -3,6 +3,7 @@ package com.warehouse.shipping
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudSync
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -30,6 +32,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
+
+// 自定义精美色调
+private val PrimaryBlue = Color(0xFF2563EB)
+private val BackgroundGray = Color(0xFFF8FAFC)
+private val SurfaceWhite = Color(0xFFFFFFFF)
 
 class MainActivity : ComponentActivity() {
     private lateinit var db: AppDatabase
@@ -64,12 +71,21 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            MaterialTheme {
+            val customColorScheme = lightColorScheme(
+                primary = PrimaryBlue,
+                onPrimary = Color.White,
+                background = BackgroundGray,
+                surface = SurfaceWhite,
+                onSurface = Color(0xFF1E293B),
+                primaryContainer = Color(0xFFDBEAFE),
+                onPrimaryContainer = PrimaryBlue
+            )
+
+            MaterialTheme(colorScheme = customColorScheme) {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
 
-                // 定义需要显示底部导航栏的页面
                 val topLevelScreens = listOf(
                     Screen.BatchList,
                     Screen.InventoryList,
@@ -77,11 +93,15 @@ class MainActivity : ComponentActivity() {
                 )
 
                 Scaffold(
+                    containerColor = BackgroundGray,
                     bottomBar = {
-                        // 只在主页面显示底部导航，详情页不显示以留出空间
                         if (currentDestination?.route in topLevelScreens.map { it.route }) {
-                            NavigationBar {
+                            NavigationBar(
+                                containerColor = SurfaceWhite,
+                                tonalElevation = 8.dp
+                            ) {
                                 topLevelScreens.forEach { screen ->
+                                    val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
                                     NavigationBarItem(
                                         icon = { 
                                             Icon(
@@ -90,17 +110,22 @@ class MainActivity : ComponentActivity() {
                                                     Screen.InventoryList -> Icons.Default.Inventory
                                                     else -> Icons.Default.CloudSync
                                                 }, 
-                                                contentDescription = null
+                                                contentDescription = null,
+                                                tint = if (isSelected) PrimaryBlue else Color(0xFF94A3B8)
                                             ) 
                                         },
                                         label = { 
-                                            Text(when(screen) {
-                                                Screen.BatchList -> "批次"
-                                                Screen.InventoryList -> "产品库"
-                                                else -> "管理"
-                                            })
+                                            Text(
+                                                when(screen) {
+                                                    Screen.BatchList -> "发货批次"
+                                                    Screen.InventoryList -> "产品库"
+                                                    else -> "多端同步"
+                                                },
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = if (isSelected) PrimaryBlue else Color(0xFF94A3B8)
+                                            )
                                         },
-                                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                                        selected = isSelected,
                                         onClick = {
                                             navController.navigate(screen.route) {
                                                 popUpTo(navController.graph.findStartDestination().id) {
@@ -109,7 +134,10 @@ class MainActivity : ComponentActivity() {
                                                 launchSingleTop = true
                                                 restoreState = true
                                             }
-                                        }
+                                        },
+                                        colors = NavigationBarItemDefaults.colors(
+                                            indicatorColor = Color(0xFFDBEAFE)
+                                        )
                                     )
                                 }
                             }
