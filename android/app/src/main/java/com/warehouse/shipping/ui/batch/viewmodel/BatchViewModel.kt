@@ -31,6 +31,18 @@ class BatchViewModel(private val repository: WarehouseRepository) : ViewModel() 
         }
     }
 
+    fun updateBatch(batch: BatchEntity) {
+        viewModelScope.launch {
+            repository.updateBatch(batch)
+        }
+    }
+
+    fun deleteBatch(id: String) {
+        viewModelScope.launch {
+            repository.softDeleteBatch(id)
+        }
+    }
+
     // Boxes in a specific batch
     fun getBoxes(batchId: String): Flow<List<BoxEntity>> = repository.getBoxesByBatchId(batchId)
     
@@ -55,8 +67,32 @@ class BatchViewModel(private val repository: WarehouseRepository) : ViewModel() 
         }
     }
 
+    fun updateBox(box: BoxEntity) {
+        viewModelScope.launch {
+            repository.updateBox(box)
+        }
+    }
+
+    fun deleteBox(id: String) {
+        viewModelScope.launch {
+            repository.softDeleteBox(id)
+        }
+    }
+
     // Products in a specific box
     fun getProducts(boxId: String): Flow<List<BoxProductEntity>> = repository.getBoxProducts(boxId)
+
+    fun updateBoxProduct(prod: BoxProductEntity) {
+        viewModelScope.launch {
+            repository.updateBoxProduct(prod)
+        }
+    }
+
+    fun deleteBoxProduct(id: String) {
+        viewModelScope.launch {
+            repository.softDeleteBoxProduct(id)
+        }
+    }
 
     fun addProduct(
         boxId: String, 

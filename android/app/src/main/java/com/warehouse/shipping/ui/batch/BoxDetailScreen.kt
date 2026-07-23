@@ -16,7 +16,8 @@ import com.warehouse.shipping.data.local.entity.BoxProductEntity
 import com.warehouse.shipping.ui.product.ProductPickerDialog
 import com.warehouse.shipping.ui.batch.viewmodel.BatchViewModel
 
-import com.warehouse.shipping.ui.components.ClickToCopyText
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Delete
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,6 +35,16 @@ fun BoxDetailScreen(
     }
 
     var showPickerDialog by remember { mutableStateOf(false) }
+    var editingProduct by remember { mutableStateOf<BoxProductEntity?>(null) }
+    var showEditDialog by remember { mutableStateOf(false) }
+    
+    // Edit Fields
+    var eName by remember { mutableStateOf("") }
+    var eQty by remember { mutableStateOf("1") }
+    var eL by remember { mutableStateOf("") }
+    var eW by remember { mutableStateOf("") }
+    var eH by remember { mutableStateOf("") }
+    var eWeight by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -75,13 +86,60 @@ fun BoxDetailScreen(
                             )
                         },
                         trailingContent = { 
-                            ClickToCopyText(
-                                text = "${item.length_cm}x${item.width_cm}x${item.height_cm}"
-                            )
+                            Row {
+                                IconButton(onClick = {
+                                    editingProduct = item
+                                    eName = item.name
+                                    eQty = item.quantity.toString()
+                                    eL = item.length_cm.toString()
+                                    eW = item.width_cm.toString()
+                                    eH = item.height_cm.toString()
+                                    eWeight = item.weight_g.toString()
+                                    showEditDialog = true
+                                }) {
+                                    Icon(Icons.Default.Edit, contentDescription = "Edit")
+                                }
+                                IconButton(onClick = { viewModel.deleteBoxProduct(item.id) }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                                }
+                            }
                         }
                     )
                 }
             }
+        }
+
+        if (showEditDialog && editingProduct != null) {
+            AlertDialog(
+                onDismissRequest = { showEditDialog = false },
+                title = { Text("编辑产品") },
+                text = {
+                    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                        OutlinedTextField(value = eName, onValueChange = { eName = it }, label = { Text("名称") })
+                        OutlinedTextField(value = eQty, onValueChange = { eQty = it }, label = { Text("数量") })
+                        Row {
+                            OutlinedTextField(value = eL, onValueChange = { eL = it }, label = { Text("长") }, modifier = Modifier.weight(1f))
+                            OutlinedTextField(value = eW, onValueChange = { eW = it }, label = { Text("宽") }, modifier = Modifier.weight(1f))
+                            OutlinedTextField(value = eH, onValueChange = { eH = it }, label = { Text("高") }, modifier = Modifier.weight(1f))
+                        }
+                        OutlinedTextField(value = eWeight, onValueChange = { eWeight = it }, label = { Text("重量(g)") })
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        viewModel.updateBoxProduct(editingProduct!!.copy(
+                            name = eName,
+                            quantity = eQty.toIntOrNull() ?: 1,
+                            length_cm = eL.toDoubleOrNull() ?: 0.0,
+                            width_cm = eW.toDoubleOrNull() ?: 0.0,
+                            height_cm = eH.toDoubleOrNull() ?: 0.0,
+                            weight_g = eWeight.toDoubleOrNull() ?: 0.0
+                        ))
+                        showEditDialog = false
+                    }) { Text("确定") }
+                },
+                dismissButton = { TextButton(onClick = { showEditDialog = false }) { Text("取消") } }
+            )
         }
 
         if (showPickerDialog) {

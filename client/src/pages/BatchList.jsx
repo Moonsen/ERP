@@ -8,6 +8,7 @@ const BatchList = () => {
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingBatch, setEditingBatch] = useState(null);
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
@@ -27,16 +28,28 @@ const BatchList = () => {
     fetchBatches();
   }, []);
 
-  const handleCreate = async (values) => {
+  const handleSave = async (values) => {
     try {
-      await axios.post('/api/batches', values);
-      message.success('创建成功');
+      if (editingBatch) {
+        await axios.put(`/api/batches/${editingBatch.id}`, values);
+        message.success('修改成功');
+      } else {
+        await axios.post('/api/batches', values);
+        message.success('创建成功');
+      }
       setIsModalVisible(false);
+      setEditingBatch(null);
       form.resetFields();
       fetchBatches();
     } catch (err) {
-      message.error('创建失败');
+      message.error('操作失败');
     }
+  };
+
+  const showEditModal = (record) => {
+    setEditingBatch(record);
+    form.setFieldsValue(record);
+    setIsModalVisible(true);
   };
 
   const handleDelete = (id) => {
@@ -66,6 +79,7 @@ const BatchList = () => {
       render: (_, record) => (
         <Space size="middle">
           <Button icon={<ArrowRightOutlined />} onClick={() => navigate(`/batches/${record.id}`)}>进入批次</Button>
+          <Button icon={<EditOutlined />} onClick={() => showEditModal(record)}>编辑</Button>
           <Button icon={<DeleteOutlined />} danger size="small" onClick={() => handleDelete(record.id)}>删除</Button>
         </Space>
       ),
@@ -85,12 +99,16 @@ const BatchList = () => {
       />
 
       <Modal
-        title="新建发货批次"
+        title={editingBatch ? "编辑发货批次" : "新建发货批次"}
         open={isModalVisible}
         onOk={() => form.submit()}
-        onCancel={() => setIsModalVisible(false)}
+        onCancel={() => {
+          setIsModalVisible(false);
+          setEditingBatch(null);
+          form.resetFields();
+        }}
       >
-        <Form form={form} layout="vertical" onFinish={handleCreate}>
+        <Form form={form} layout="vertical" onFinish={handleSave}>
           <Form.Item name="name" label="批次名称" rules={[{ required: true, message: '请输入名称' }]}>
             <Input placeholder="例如: 2024-03-FBA-001" />
           </Form.Item>

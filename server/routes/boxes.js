@@ -55,6 +55,23 @@ router.post('/', (req, res) => {
   }
 });
 
+router.put('/:id', (req, res) => {
+  const { length_cm, width_cm, height_cm, weight_kg } = req.body;
+  const now = new Date().toISOString();
+
+  try {
+    const info = db.prepare(`
+      UPDATE box SET length_cm = ?, width_cm = ?, height_cm = ?, weight_kg = ?, updated_at = ?
+      WHERE id = ?
+    `).run(length_cm, width_cm, height_cm, weight_kg, now, req.params.id);
+
+    if (info.changes === 0) return res.status(404).json({ error: '未找到箱子' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.delete('/:id', (req, res) => {
   const now = new Date().toISOString();
   try {

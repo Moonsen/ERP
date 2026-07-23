@@ -14,6 +14,7 @@ const BoxDetail = () => {
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
   const [form] = Form.useForm();
   const [activeTab, setActiveTab] = useState('1');
 
@@ -39,39 +40,52 @@ const BoxDetail = () => {
     fetchData();
   }, [id]);
 
-  const handleAddProduct = async (values) => {
+  const handleSaveProduct = async (values) => {
     try {
-      let payload;
-      if (activeTab === '1') {
-        // From Inventory
-        const item = inventory.find(i => i.id === values.inventory_id);
-        payload = {
-          box_id: id,
-          inventory_id: item.id,
-          name: item.name,
-          barcode: item.barcode,
-          length_cm: item.length_cm,
-          width_cm: item.width_cm,
-          height_cm: item.height_cm,
-          weight_g: item.weight_g,
-          quantity: values.quantity
-        };
+      if (editingProduct) {
+        await axios.put(`/api/box-products/${editingProduct.id}`, values);
+        message.success('修改成功');
       } else {
-        // Manual Entry
-        payload = {
-          box_id: id,
-          ...values
-        };
+        let payload;
+        if (activeTab === '1') {
+          // From Inventory
+          const item = inventory.find(i => i.id === values.inventory_id);
+          payload = {
+            box_id: id,
+            inventory_id: item.id,
+            name: item.name,
+            barcode: item.barcode,
+            length_cm: item.length_cm,
+            width_cm: item.width_cm,
+            height_cm: item.height_cm,
+            weight_g: item.weight_g,
+            quantity: values.quantity
+          };
+        } else {
+          // Manual Entry
+          payload = {
+            box_id: id,
+            ...values
+          };
+        }
+        await axios.post('/api/box-products', payload);
+        message.success('添加成功');
       }
-
-      await axios.post('/api/box-products', payload);
-      message.success('添加成功');
       setIsModalVisible(false);
+      setEditingProduct(null);
       form.resetFields();
       fetchData();
     } catch (err) {
-      message.error('添加失败');
+      console.error('Save failed:', err);
+      message.error('保存失败');
     }
+  };
+
+  const showEditModal = (record) => {
+    setEditingProduct(record);
+    form.setFieldsValue(record);
+    setActiveTab('2'); // Use manual input tab for editing existing records
+    setIsModalVisible(true);
   };
 
   const columns = [
@@ -100,7 +114,10 @@ const BoxDetail = () => {
       title: '操作',
       key: 'action',
       render: (_, record) => (
-        <Button icon={<DeleteOutlined />} danger size="small" onClick={() => handleDelete(record.id)}>删除</Button>
+        <Space size="middle">
+          <Button icon={<EditOutlined />} size="small" onClick={() => showEditModal(record)}>编辑</Button>
+          <Button icon={<DeleteOutlined />} danger size="small" onClick={() => handleDelete(record.id)}>删除</Button>
+        </Space>
       ),
     },
   ];
@@ -150,36 +167,42 @@ const BoxDetail = () => {
       />
 
       <Modal
-        title="添加产品到箱子"
+        title={editingProduct ? "编辑产品" : "添加产品到箱子"}
         open={isModalVisible}
         onOk={() => form.submit()}
-        onCancel={() => setIsModalVisible(false)}
+        onCancel={() => {
+          setIsModalVisible(false);
+          setEditingProduct(null);
+          form.resetFields();
+        }}
         width={600}
       >
         <Tabs activeKey={activeTab} onChange={setActiveTab}>
-          <TabPane tab="从产品库选择" key="1">
-            <Form form={form} layout="vertical" onFinish={handleAddProduct}>
-              <Form.Item name="inventory_id" label="选择产品" rules={[{ required: true }]}>
-                <Select
-                  showSearch
-                  placeholder="搜索名称/编码/条形码"
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                  }
-                  options={inventory.map(i => ({
-                    value: i.id,
-                    label: `${i.name} (${i.product_code || '无编码'}) - ${i.length_cm}x${i.width_cm}x${i.height_cm}cm`
-                  }))}
-                />
-              </Form.Item>
-              <Form.Item name="quantity" label="数量" rules={[{ required: true }]}>
-                <InputNumber min={1} style={{ width: '100%' }} />
-              </Form.Item>
-            </Form>
-          </TabPane>
-          <TabPane tab="手动输入" key="2">
-            <Form form={form} layout="vertical" onFinish={handleAddProduct}>
+          {!editingProduct && (
+            <TabPane tab="从产品库选择" key="1">
+              <Form form={form} layout="vertical" onFinish={handleSaveProduct}>
+                <Form.Item name="inventory_id" label="选择产品" rules={[{ required: true }]}>
+                  <Select
+                    showSearch
+                    placeholder="搜索名称/编码/条形码"
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                    }
+                    options={inventory.map(i => ({
+                      value: i.id,
+                      label: `${i.name} (${i.product_code || '无编码'}) - ${i.length_cm}x${i.width_cm}x${i.height_cm}cm`
+                    }))}
+                  />
+                </Form.Item>
+                <Form.Item name="quantity" label="数量" rules={[{ required: true }]}>
+                  <InputNumber min={1} style={{ width: '100%' }} />
+                </Form.Item>
+              </Form>
+            </TabPane>
+          )}
+          <TabPane tab={editingProduct ? "产品信息" : "手动输入"} key="2">
+            <Form form={form} layout="vertical" onFinish={handleSaveProduct}>
               <Form.Item name="name" label="产品名称" rules={[{ required: true }]}>
                 <Input />
               </Form.Item>

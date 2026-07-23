@@ -53,6 +53,9 @@ class WarehouseRepository(private val db: AppDatabase) {
             machine_id = getMid()
         ))
     }
+    suspend fun updateBatch(batch: BatchEntity) {
+        db.batchDao().update(batch.copy(updated_at = now(), machine_id = getMid()))
+    }
     suspend fun softDeleteBatch(id: String) = db.batchDao().softDelete(id, now(), now())
 
     // Boxes
@@ -68,10 +71,18 @@ class WarehouseRepository(private val db: AppDatabase) {
             machine_id = getMid()
         ))
     }
+    suspend fun updateBox(box: BoxEntity) {
+        db.boxDao().update(box.copy(updated_at = now(), machine_id = getMid()))
+    }
     suspend fun softDeleteBox(id: String) = db.boxDao().softDelete(id, now(), now())
 
     // Box Products
     fun getBoxProducts(boxId: String): Flow<List<BoxProductEntity>> = db.boxProductDao().getByBoxId(boxId)
+    
+    suspend fun updateBoxProduct(prod: BoxProductEntity) {
+        db.boxProductDao().update(prod.copy(updated_at = now(), machine_id = getMid()))
+    }
+    suspend fun softDeleteBoxProduct(id: String) = db.boxProductDao().softDelete(id, now(), now())
     
     suspend fun addProductToBox(
         boxId: String, 

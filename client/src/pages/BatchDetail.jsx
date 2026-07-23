@@ -11,6 +11,7 @@ const BatchDetail = () => {
   const [boxes, setBoxes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingBox, setEditingBox] = useState(null);
   const [form] = Form.useForm();
 
   const fetchData = async () => {
@@ -32,16 +33,28 @@ const BatchDetail = () => {
     fetchData();
   }, [id]);
 
-  const handleCreateBox = async (values) => {
+  const handleSaveBox = async (values) => {
     try {
-      await axios.post('/api/boxes', { ...values, batch_id: id });
-      message.success('添加箱子成功');
+      if (editingBox) {
+        await axios.put(`/api/boxes/${editingBox.id}`, values);
+        message.success('修改成功');
+      } else {
+        await axios.post('/api/boxes', { ...values, batch_id: id });
+        message.success('添加箱子成功');
+      }
       setIsModalVisible(false);
+      setEditingBox(null);
       form.resetFields();
       fetchData();
     } catch (err) {
-      message.error('添加失败');
+      message.error('保存失败');
     }
+  };
+
+  const showEditBoxModal = (record) => {
+    setEditingBox(record);
+    form.setFieldsValue(record);
+    setIsModalVisible(true);
   };
 
   const handleDeleteBox = (boxId) => {
@@ -81,6 +94,7 @@ const BatchDetail = () => {
       render: (_, record) => (
         <Space size="middle">
           <Button icon={<ArrowRightOutlined />} onClick={() => navigate(`/boxes/${record.id}`)}>装箱明细</Button>
+          <Button icon={<EditOutlined />} size="small" onClick={() => showEditBoxModal(record)}>编辑</Button>
           <Button icon={<DeleteOutlined />} danger size="small" onClick={() => handleDeleteBox(record.id)}>删除</Button>
         </Space>
       ),
@@ -116,12 +130,16 @@ const BatchDetail = () => {
       />
 
       <Modal
-        title="添加箱子"
+        title={editingBox ? "编辑箱子" : "添加箱子"}
         open={isModalVisible}
         onOk={() => form.submit()}
-        onCancel={() => setIsModalVisible(false)}
+        onCancel={() => {
+          setIsModalVisible(false);
+          setEditingBox(null);
+          form.resetFields();
+        }}
       >
-        <Form form={form} layout="vertical" onFinish={handleCreateBox} initialValues={{ length_cm: 50, width_cm: 40, height_cm: 30, weight_kg: 10 }}>
+        <Form form={form} layout="vertical" onFinish={handleSaveBox} initialValues={{ length_cm: 50, width_cm: 40, height_cm: 30, weight_kg: 10 }}>
           <Space>
             <Form.Item name="length_cm" label="长 (cm)" rules={[{ required: true }]}>
               <InputNumber min={0.1} />

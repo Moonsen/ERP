@@ -40,6 +40,23 @@ router.post('/', (req, res) => {
   }
 });
 
+router.put('/:id', (req, res) => {
+  const { name, destination, remark } = req.body;
+  const now = new Date().toISOString();
+
+  try {
+    const info = db.prepare(`
+      UPDATE batch SET name = ?, destination = ?, remark = ?, updated_at = ?
+      WHERE id = ?
+    `).run(name, destination || null, remark || null, now, req.params.id);
+
+    if (info.changes === 0) return res.status(404).json({ error: '未找到批次' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.delete('/:id', (req, res) => {
   const now = new Date().toISOString();
   try {

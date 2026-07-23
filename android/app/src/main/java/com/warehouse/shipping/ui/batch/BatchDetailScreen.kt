@@ -17,7 +17,8 @@ import com.warehouse.shipping.data.local.entity.BoxEntity
 import com.warehouse.shipping.ui.navigation.Screen
 import com.warehouse.shipping.ui.batch.viewmodel.BatchViewModel
 
-import com.warehouse.shipping.ui.components.ClickToCopyText
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Delete
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,7 +31,13 @@ fun BatchDetailScreen(
     val batch = batches.find { b -> b.id == batchId }
     val boxes by viewModel.getBoxes(batchId).collectAsState(initial = emptyList())
     
-    var showAddBoxDialog by remember { mutableStateOf(false) }
+    var showBoxDialog by remember { mutableStateOf(false) }
+    var editingBox by remember { mutableStateOf<BoxEntity?>(null) }
+    
+    var length by remember { mutableStateOf("50.0") }
+    var width by remember { mutableStateOf("40.0") }
+    var height by remember { mutableStateOf("30.0") }
+    var weight by remember { mutableStateOf("0.0") }
 
     Scaffold(
         topBar = {
@@ -44,7 +51,11 @@ fun BatchDetailScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { showAddBoxDialog = true }) {
+            FloatingActionButton(onClick = { 
+                editingBox = null
+                length = "50.0"; width = "40.0"; height = "30.0"; weight = "0.0"
+                showBoxDialog = true 
+            }) {
                 Icon(Icons.Default.Add, contentDescription = "Add Box")
             }
         }
@@ -68,6 +79,23 @@ fun BatchDetailScreen(
                                 text = "${item.length_cm}x${item.width_cm}x${item.height_cm}cm | ${item.weight_kg}kg"
                             )
                         },
+                        trailingContent = {
+                            Row {
+                                IconButton(onClick = {
+                                    editingBox = item
+                                    length = item.length_cm.toString()
+                                    width = item.width_cm.toString()
+                                    height = item.height_cm.toString()
+                                    weight = item.weight_kg.toString()
+                                    showBoxDialog = true
+                                }) {
+                                    Icon(Icons.Default.Edit, contentDescription = "Edit")
+                                }
+                                IconButton(onClick = { viewModel.deleteBox(item.id) }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                                }
+                            }
+                        },
                         modifier = Modifier.clickable { 
                             navController.navigate(Screen.BoxDetail.createRoute(item.id))
                         }
@@ -76,17 +104,40 @@ fun BatchDetailScreen(
             }
         }
 
-        if (showAddBoxDialog) {
-            // Simplified Add Box Dialog
+        if (showBoxDialog) {
             AlertDialog(
-                onDismissRequest = { showAddBoxDialog = false },
-                title = { Text("添加箱子") },
-                text = { Text("确认添加一个新的空箱？规格默认 50x40x30cm") },
+                onDismissRequest = { showBoxDialog = false },
+                title = { Text(if (editingBox == null) "添加箱子" else "编辑箱子") },
+                text = {
+                    Column {
+                        Row {
+                            OutlinedTextField(value = length, onValueChange = { length = it }, label = { Text("长") }, modifier = Modifier.weight(1f))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            OutlinedTextField(value = width, onValueChange = { width = it }, label = { Text("宽") }, modifier = Modifier.weight(1f))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            OutlinedTextField(value = height, onValueChange = { height = it }, label = { Text("高") }, modifier = Modifier.weight(1f))
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(value = weight, onValueChange = { weight = it }, label = { Text("重量(kg)") }, modifier = Modifier.fillMaxWidth())
+                    }
+                },
                 confirmButton = {
                     TextButton(onClick = {
-                        viewModel.addBox(batchId, 50.0, 40.0, 30.0, 0.0)
-                        showAddBoxDialog = false
-                    }) { Text("添加") }
+                        val l = length.toDoubleOrNull() ?: 0.0
+                        val w = width.toDoubleOrNull() ?: 0.0
+                        val h = height.toDoubleOrNull() ?: 0.0
+                        val wg = weight.toDoubleOrNull() ?: 0.0
+                        
+                        if (editingBox == null) {
+                            viewModel.addBox(batchId, l, w, h, wg)
+                        } else {
+                            viewModel.updateBox(editingBox!!.copy(length_cm = l, width_cm = w, height_cm = h, weight_kg = wg))
+                        }
+                        showBoxDialog = false
+                    }) { Text("确定") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showBoxDialog = false }) { Text("取消") }
                 }
             )
         }

@@ -54,6 +54,24 @@ router.post('/', (req, res) => {
   }
 });
 
+router.put('/:id', (req, res) => {
+  const { quantity, name, barcode, length_cm, width_cm, height_cm, weight_g } = req.body;
+  const now = new Date().toISOString();
+
+  try {
+    const info = db.prepare(`
+      UPDATE box_product
+      SET quantity = ?, name = ?, barcode = ?, length_cm = ?, width_cm = ?, height_cm = ?, weight_g = ?, updated_at = ?
+      WHERE id = ?
+    `).run(quantity, name, barcode || null, length_cm, width_cm, height_cm, weight_g, now, req.params.id);
+
+    if (info.changes === 0) return res.status(404).json({ error: '未找到记录' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.delete('/:id', (req, res) => {
   const now = new Date().toISOString();
   try {
