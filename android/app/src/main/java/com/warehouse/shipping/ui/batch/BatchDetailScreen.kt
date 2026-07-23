@@ -61,11 +61,32 @@ fun BatchDetailScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            if (batch != null) {
-                Card(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("目的地: ${batch.destination ?: "未设置"}")
-                        Text("备注: ${batch.remark ?: "无"}")
+            val totalWeight = boxes.sumOf { it.weight_kg }
+            val totalVolumeCm = boxes.sumOf { it.length_cm * it.width_cm * it.height_cm }
+            val totalVolumeM3 = totalVolumeCm / 1000000.0
+
+            Card(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    if (batch != null) {
+                        Text("批次: ${batch.name}", style = MaterialTheme.typography.titleMedium)
+                        Text("目的地: ${batch.destination ?: "未设置"}", style = MaterialTheme.typography.bodySmall)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                    Divider()
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Column {
+                            Text("总重量", style = MaterialTheme.typography.labelSmall)
+                            Text("${String.format("%.2f", totalWeight)} kg", color = MaterialTheme.colorScheme.secondary, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                        }
+                        Column {
+                            Text("总体积 (cm³)", style = MaterialTheme.typography.labelSmall)
+                            Text(String.format("%.2f", totalVolumeCm), color = MaterialTheme.colorScheme.primary)
+                        }
+                        Column {
+                            Text("总体积 (m³)", style = MaterialTheme.typography.labelSmall)
+                            Text(String.format("%.2f", totalVolumeM3), color = MaterialTheme.colorScheme.error, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                        }
                     }
                 }
             }

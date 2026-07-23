@@ -101,6 +101,19 @@ const BatchDetail = () => {
     },
   ];
 
+  const calculateStats = () => {
+    const totalWeight = boxes.reduce((sum, box) => sum + (box.weight_kg || 0), 0);
+    const totalVolumeCm = boxes.reduce((sum, box) => sum + (box.length_cm * box.width_cm * box.height_cm), 0);
+    const totalVolumeM3 = totalVolumeCm / 1000000;
+    return {
+      weight: totalWeight.toFixed(2),
+      volumeCm: totalVolumeCm.toFixed(2),
+      volumeM3: totalVolumeM3.toFixed(2)
+    };
+  };
+
+  const stats = calculateStats();
+
   if (!batch) return <div>加载中...</div>;
 
   return (
@@ -111,9 +124,18 @@ const BatchDetail = () => {
       </Breadcrumb>
 
       <Card style={{ marginBottom: 16 }}>
-        <Descriptions title="批次信息" bordered size="small">
+        <Descriptions title="批次统计信息" bordered size="small" column={2}>
           <Descriptions.Item label="批次名称">{batch.name}</Descriptions.Item>
           <Descriptions.Item label="目的地">{batch.destination || '未设置'}</Descriptions.Item>
+          <Descriptions.Item label="总重量 (kg)">
+            <Typography.Text strong type="warning">{stats.weight}</Typography.Text>
+          </Descriptions.Item>
+          <Descriptions.Item label="总体积 (cm³)">
+            <Typography.Text strong type="success">{stats.volumeCm}</Typography.Text>
+          </Descriptions.Item>
+          <Descriptions.Item label="总体积 (m³)">
+            <Typography.Text strong type="danger">{stats.volumeM3}</Typography.Text>
+          </Descriptions.Item>
           <Descriptions.Item label="备注">{batch.remark || '无'}</Descriptions.Item>
         </Descriptions>
       </Card>
