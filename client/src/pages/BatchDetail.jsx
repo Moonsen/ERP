@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Table, Button, Space, message, Modal, Form, InputNumber, Breadcrumb, Card, Descriptions } from 'antd';
+import { Table, Button, Space, message, Modal, Form, InputNumber, Breadcrumb, Card, Descriptions, Typography } from 'antd';
 import { PlusOutlined, DeleteOutlined, ArrowRightOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
@@ -65,9 +65,16 @@ const BatchDetail = () => {
     {
       title: '尺寸 (cm)',
       key: 'dimensions',
-      render: (_, record) => `${record.length_cm} x ${record.width_cm} x ${record.height_cm}`
+      render: (_, record) => (
+        <Typography.Text copyable>{`${record.length_cm} x ${record.width_cm} x ${record.height_cm}`}</Typography.Text>
+      )
     },
-    { title: '重量 (kg)', dataIndex: 'weight_kg', key: 'weight_kg' },
+    {
+      title: '重量 (kg)',
+      dataIndex: 'weight_kg',
+      key: 'weight_kg',
+      render: (text) => <Typography.Text copyable>{text}</Typography.Text>
+    },
     {
       title: '操作',
       key: 'action',

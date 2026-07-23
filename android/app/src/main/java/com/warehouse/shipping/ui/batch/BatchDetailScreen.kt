@@ -17,6 +17,8 @@ import com.warehouse.shipping.data.local.entity.BoxEntity
 import com.warehouse.shipping.ui.navigation.Screen
 import com.warehouse.shipping.ui.batch.viewmodel.BatchViewModel
 
+import com.warehouse.shipping.ui.components.ClickToCopyText
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BatchDetailScreen(
@@ -61,7 +63,11 @@ fun BatchDetailScreen(
                 items(boxes) { item ->
                     ListItem(
                         headlineContent = { Text("第 ${item.box_number} 箱") },
-                        supportingContent = { Text("${item.length_cm}x${item.width_cm}x${item.height_cm}cm | ${item.weight_kg}kg") },
+                        supportingContent = { 
+                            ClickToCopyText(
+                                text = "${item.length_cm}x${item.width_cm}x${item.height_cm}cm | ${item.weight_kg}kg"
+                            )
+                        },
                         modifier = Modifier.clickable { 
                             navController.navigate(Screen.BoxDetail.createRoute(item.id))
                         }

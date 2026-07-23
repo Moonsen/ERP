@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Table, Button, Space, message, Modal, Form, Input, InputNumber, Breadcrumb, Card, Descriptions, Tabs, Select } from 'antd';
+import { Table, Button, Space, message, Modal, Form, Input, InputNumber, Breadcrumb, Card, Descriptions, Tabs, Select, Typography } from 'antd';
 import { PlusOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
@@ -77,13 +77,25 @@ const BoxDetail = () => {
   const columns = [
     { title: '编号', dataIndex: 'product_number', key: 'product_number' },
     { title: '名称', dataIndex: 'name', key: 'name' },
-    { title: '数量', dataIndex: 'quantity', key: 'quantity' },
+    {
+      title: '数量',
+      dataIndex: 'quantity',
+      key: 'quantity',
+      render: (text) => <Typography.Text copyable>{text}</Typography.Text>
+    },
     {
       title: '单品尺寸 (cm)',
       key: 'dimensions',
-      render: (_, record) => `${record.length_cm} x ${record.width_cm} x ${record.height_cm}`
+      render: (_, record) => (
+        <Typography.Text copyable>{`${record.length_cm} x ${record.width_cm} x ${record.height_cm}`}</Typography.Text>
+      )
     },
-    { title: '单品重量 (g)', dataIndex: 'weight_g', key: 'weight_g' },
+    {
+      title: '单品重量 (g)',
+      dataIndex: 'weight_g',
+      key: 'weight_g',
+      render: (text) => <Typography.Text copyable>{text}</Typography.Text>
+    },
     {
       title: '操作',
       key: 'action',

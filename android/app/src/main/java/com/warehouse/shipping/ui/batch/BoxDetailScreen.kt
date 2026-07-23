@@ -16,6 +16,8 @@ import com.warehouse.shipping.data.local.entity.BoxProductEntity
 import com.warehouse.shipping.ui.product.ProductPickerDialog
 import com.warehouse.shipping.ui.batch.viewmodel.BatchViewModel
 
+import com.warehouse.shipping.ui.components.ClickToCopyText
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BoxDetailScreen(
@@ -67,8 +69,16 @@ fun BoxDetailScreen(
                 items(products) { item ->
                     ListItem(
                         headlineContent = { Text(item.name) },
-                        supportingContent = { Text("数量: ${item.quantity} | ${item.weight_g}g") },
-                        trailingContent = { Text("${item.length_cm}x${item.width_cm}x${item.height_cm}") }
+                        supportingContent = { 
+                            ClickToCopyText(
+                                text = "数量: ${item.quantity} | ${item.weight_g}g"
+                            )
+                        },
+                        trailingContent = { 
+                            ClickToCopyText(
+                                text = "${item.length_cm}x${item.width_cm}x${item.height_cm}"
+                            )
+                        }
                     )
                 }
             }

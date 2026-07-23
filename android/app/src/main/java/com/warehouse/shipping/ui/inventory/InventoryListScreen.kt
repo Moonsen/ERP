@@ -18,6 +18,8 @@ import com.warehouse.shipping.ui.navigation.Screen
 import androidx.compose.ui.res.painterResource
 import com.warehouse.shipping.R
 
+import com.warehouse.shipping.ui.components.ClickToCopyText
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InventoryListScreen(
@@ -77,7 +79,9 @@ fun ProductItem(product: ProductInventoryEntity, onClick: () -> Unit) {
     ListItem(
         headlineContent = { Text(product.name) },
         supportingContent = { 
-            Text("${product.length_cm}x${product.width_cm}x${product.height_cm}cm | ${product.weight_g}g") 
+            ClickToCopyText(
+                text = "${product.length_cm}x${product.width_cm}x${product.height_cm}cm | ${product.weight_g}g"
+            )
         },
         overlineContent = { product.product_code?.let { Text(it) } },
         trailingContent = { product.barcode?.let { Text(it) } },

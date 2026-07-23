@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Input, Space, message, Modal } from 'antd';
+import { Table, Button, Input, Space, message, Modal, Typography } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -49,9 +49,16 @@ const InventoryList = () => {
     {
       title: '尺寸 (cm)',
       key: 'dimensions',
-      render: (_, record) => `${record.length_cm} x ${record.width_cm} x ${record.height_cm}`
+      render: (_, record) => (
+        <Typography.Text copyable>{`${record.length_cm} x ${record.width_cm} x ${record.height_cm}`}</Typography.Text>
+      )
     },
-    { title: '重量 (g)', dataIndex: 'weight_g', key: 'weight_g' },
+    {
+      title: '重量 (g)',
+      dataIndex: 'weight_g',
+      key: 'weight_g',
+      render: (text) => <Typography.Text copyable>{text}</Typography.Text>
+    },
     {
       title: '规格数',
       key: 'specs_count',
