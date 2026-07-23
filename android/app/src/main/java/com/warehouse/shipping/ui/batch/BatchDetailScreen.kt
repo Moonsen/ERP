@@ -16,6 +16,7 @@ import com.warehouse.shipping.data.local.entity.BatchEntity
 import com.warehouse.shipping.data.local.entity.BoxEntity
 import com.warehouse.shipping.ui.navigation.Screen
 import com.warehouse.shipping.ui.batch.viewmodel.BatchViewModel
+import com.warehouse.shipping.ui.components.ClickToCopyText
 
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Delete

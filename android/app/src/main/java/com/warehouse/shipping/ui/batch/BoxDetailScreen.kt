@@ -3,6 +3,8 @@ package com.warehouse.shipping.ui.batch
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -15,6 +17,7 @@ import com.warehouse.shipping.data.local.entity.BoxEntity
 import com.warehouse.shipping.data.local.entity.BoxProductEntity
 import com.warehouse.shipping.ui.product.ProductPickerDialog
 import com.warehouse.shipping.ui.batch.viewmodel.BatchViewModel
+import com.warehouse.shipping.ui.components.ClickToCopyText
 
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Delete
