@@ -22,7 +22,8 @@ const DataManage = () => {
 
   useEffect(() => {
     fetchStats();
-    // ... config loading logic
+
+    const fetchConfig = async () => {
       try {
         const res = await axios.get('/api/sync/config');
         configForm.setFieldsValue({
@@ -51,6 +52,7 @@ const DataManage = () => {
     try {
       await axios.post('/api/sync/start');
       message.success('同步成功');
+      fetchStats(); // Update stats after sync
     } catch (err) {
       message.error('同步失败: ' + (err.response?.data?.error || err.message));
     } finally {
@@ -107,7 +109,7 @@ const DataManage = () => {
             <Input placeholder="例如: https://dav.jianguoyun.com/dav/" />
           </Form.Item>
           <Form.Item name="username" label="账号 (Email)" rules={[{ required: true, message: '请输入账号' }]}>
-            <Input placeholder="坚果云登录邮箱" />
+            <Input placeholder="坚云登录邮箱" />
           </Form.Item>
           <Form.Item name="password" label="应用密码" rules={[{ required: true, message: '请输入应用密码' }]}>
             <Input.Password placeholder="在坚果云后台生成的第三方应用密码" />
