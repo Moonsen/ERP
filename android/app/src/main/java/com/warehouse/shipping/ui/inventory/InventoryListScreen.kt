@@ -5,19 +5,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.warehouse.shipping.data.local.entity.ProductInventoryEntity
-import com.warehouse.shipping.ui.navigation.Screen
-import com.warehouse.shipping.ui.components.ClickToCopyText
-import androidx.compose.ui.res.painterResource
 import com.warehouse.shipping.R
+import com.warehouse.shipping.data.local.entity.ProductInventoryEntity
+import com.warehouse.shipping.ui.components.ClickToCopyText
+import com.warehouse.shipping.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +46,7 @@ fun InventoryListScreen(
         topBar = {
             TopAppBar(
                 title = { 
-                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_logo),
                             contentDescription = null,
@@ -93,12 +95,6 @@ fun InventoryListScreen(
         }
     }
 }
-
-import androidx.compose.material.icons.filled.Straighten
-import androidx.compose.material.icons.filled.Scale
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.graphics.Color
 
 @Composable
 fun ProductItem(product: ProductInventoryEntity, onClick: () -> Unit) {
