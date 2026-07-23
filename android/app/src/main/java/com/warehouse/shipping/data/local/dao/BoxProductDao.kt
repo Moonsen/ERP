@@ -23,4 +23,7 @@ interface BoxProductDao {
 
     @Query("SELECT * FROM box_product WHERE updated_at > :lastSyncTime")
     suspend fun getDirty(lastSyncTime: String): List<BoxProductEntity>
+
+    @Query("DELETE FROM box_product")
+    suspend fun deleteAll()
 }

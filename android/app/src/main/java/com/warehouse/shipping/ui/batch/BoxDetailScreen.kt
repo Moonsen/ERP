@@ -23,12 +23,12 @@ fun BoxDetailScreen(
     boxId: String,
     viewModel: BatchViewModel
 ) {
-    var box by remember { mutableStateOf<BoxEntity?>(null) }
+    var currentBox by remember { mutableStateOf<BoxEntity?>(null) }
     val products by viewModel.getProducts(boxId).collectAsState(initial = emptyList())
     val inventory by viewModel.allInventory.collectAsState(initial = emptyList())
 
     LaunchedEffect(boxId) {
-        box = viewModel.getBox(boxId)
+        currentBox = viewModel.getBox(boxId)
     }
 
     var showPickerDialog by remember { mutableStateOf(false) }
@@ -36,7 +36,10 @@ fun BoxDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (box != null) "第 ${box?.box_number} 箱" else "箱子详情") },
+                title = { 
+                    val b = currentBox
+                    Text(if (b != null) "第 ${b.box_number} 箱" else "箱子详情") 
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -51,7 +54,7 @@ fun BoxDetailScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            box?.let { b ->
+            currentBox?.let { b ->
                 Card(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("箱子规格: ${b.length_cm}x${b.width_cm}x${b.height_cm}cm")

@@ -21,12 +21,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun DataManageScreen(navController: NavController, viewModel: SettingsViewModel) {
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     val syncStatus by viewModel.syncStatus.collectAsState()
     
     var showRestoreConfirm by remember { mutableStateOf(false) }
     
-    // WebDAV Config States
     var url by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -36,10 +34,7 @@ fun DataManageScreen(navController: NavController, viewModel: SettingsViewModel)
     ) { uri ->
         uri?.let {
             scope.launch {
-                val success = viewModel.importBackup(it)
-                if (success) {
-                    // Success logic
-                }
+                viewModel.importBackup(it)
             }
         }
     }
@@ -126,7 +121,6 @@ fun DataManageScreen(navController: NavController, viewModel: SettingsViewModel)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            // Using a simple Box as a divider for maximum compatibility
             Box(modifier = Modifier.fillMaxWidth().height(1.dp).padding(horizontal = 8.dp))
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -137,8 +131,7 @@ fun DataManageScreen(navController: NavController, viewModel: SettingsViewModel)
                     OutlinedButton(
                         onClick = { 
                             scope.launch {
-                                val file = viewModel.exportBackup()
-                                // Share file logic
+                                viewModel.exportBackup()
                             }
                         },
                         modifier = Modifier.fillMaxWidth()
@@ -163,7 +156,7 @@ fun DataManageScreen(navController: NavController, viewModel: SettingsViewModel)
             AlertDialog(
                 onDismissRequest = { showRestoreConfirm = false },
                 title = { Text("确认恢复数据？") },
-                text = { Text("恢复操作将清空当前所有本地数据，并替换为备份文件中的内容。建议先进行备份。") },
+                text = { Text("恢复操作将清空当前所有本地数据，并替换为备份文件中的内容。") },
                 confirmButton = {
                     TextButton(
                         onClick = { 

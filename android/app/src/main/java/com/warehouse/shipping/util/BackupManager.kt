@@ -43,13 +43,13 @@ class BackupManager(private val db: AppDatabase, private val context: Context) {
             if (jsonString != null) {
                 val data = json.decodeFromString<SyncData>(jsonString)
                 db.withTransaction {
-                    // Physical delete all business data as per spec 5.3
-                    db.query("DELETE FROM box_product", null).close()
-                    db.query("DELETE FROM product_inventory", null).close()
-                    db.query("DELETE FROM box", null).close()
-                    db.query("DELETE FROM batch", null).close()
+                    // Physical delete all business data
+                    db.boxProductDao().deleteAll()
+                    db.productInventoryDao().deleteAll()
+                    db.boxDao().deleteAll()
+                    db.batchDao().deleteAll()
 
-                    // Batch insert everything using loops (supports suspend calls)
+                    // Batch insert everything
                     for (batch in data.batches) {
                         db.batchDao().insert(batch)
                     }

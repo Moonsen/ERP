@@ -1,20 +1,20 @@
 package com.warehouse.shipping.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.warehouse.shipping.ui.inventory.InventoryListScreen
+import com.warehouse.shipping.ui.inventory.InventoryListViewModel
 import com.warehouse.shipping.ui.inventory.InventoryEditScreen
+import com.warehouse.shipping.ui.inventory.InventoryEditViewModel
 import com.warehouse.shipping.ui.batch.BatchListScreen
 import com.warehouse.shipping.ui.batch.BatchDetailScreen
 import com.warehouse.shipping.ui.batch.BoxDetailScreen
-import com.warehouse.shipping.ui.settings.DataManageScreen
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.warehouse.shipping.ui.inventory.InventoryListScreen
-import com.warehouse.shipping.ui.inventory.InventoryListViewModel
-import com.warehouse.shipping.ui.inventory.InventoryEditViewModel
 import com.warehouse.shipping.ui.batch.viewmodel.BatchViewModel
+import com.warehouse.shipping.ui.settings.DataManageScreen
 import com.warehouse.shipping.ui.settings.SettingsViewModel
 
 sealed class Screen(val route: String) {

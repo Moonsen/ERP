@@ -26,4 +26,7 @@ interface ProductInventoryDao {
 
     @Query("SELECT * FROM product_inventory WHERE updated_at > :lastSyncTime")
     suspend fun getDirty(lastSyncTime: String): List<ProductInventoryEntity>
+
+    @Query("DELETE FROM product_inventory")
+    suspend fun deleteAll()
 }

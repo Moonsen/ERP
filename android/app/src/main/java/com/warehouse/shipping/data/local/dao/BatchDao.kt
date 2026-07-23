@@ -20,4 +20,7 @@ interface BatchDao {
 
     @Query("SELECT * FROM batch WHERE updated_at > :lastSyncTime")
     suspend fun getDirty(lastSyncTime: String): List<BatchEntity>
+
+    @Query("DELETE FROM batch")
+    suspend fun deleteAll()
 }
