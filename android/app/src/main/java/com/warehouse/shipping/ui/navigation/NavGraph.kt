@@ -1,6 +1,7 @@
 package com.warehouse.shipping.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -33,10 +34,15 @@ sealed class Screen(val route: String) {
 }
 
 @Composable
-fun NavGraph(navController: NavHostController, factory: ViewModelProvider.Factory) {
+fun NavGraph(
+    navController: NavHostController, 
+    factory: ViewModelProvider.Factory,
+    modifier: Modifier = Modifier
+) {
     NavHost(
         navController = navController,
-        startDestination = Screen.BatchList.route
+        startDestination = Screen.BatchList.route,
+        modifier = modifier
     ) {
         composable(Screen.InventoryList.route) {
             val vm: InventoryListViewModel = viewModel(factory = factory)
