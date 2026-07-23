@@ -56,6 +56,7 @@ class WarehouseRepository(private val db: AppDatabase) {
     suspend fun softDeleteBatch(id: String) = db.batchDao().softDelete(id, now(), now())
 
     // Boxes
+    suspend fun getBoxById(id: String) = db.boxDao().getById(id)
     fun getBoxesByBatchId(batchId: String): Flow<List<BoxEntity>> = db.boxDao().getByBatchId(batchId)
     suspend fun insertBox(box: BoxEntity) {
         val nextNum = (db.boxDao().getMaxBoxNumber(box.batch_id) ?: 0) + 1

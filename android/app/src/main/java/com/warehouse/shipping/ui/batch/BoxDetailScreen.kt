@@ -23,15 +23,20 @@ fun BoxDetailScreen(
     boxId: String,
     viewModel: BatchViewModel
 ) {
+    var box by remember { mutableStateOf<BoxEntity?>(null) }
     val products by viewModel.getProducts(boxId).collectAsState(initial = emptyList())
     val inventory by viewModel.allInventory.collectAsState(initial = emptyList())
+
+    LaunchedEffect(boxId) {
+        box = viewModel.getBox(boxId)
+    }
 
     var showPickerDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("箱子详情") },
+                title = { Text(if (box != null) "第 ${box?.box_number} 箱" else "箱子详情") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -46,21 +51,21 @@ fun BoxDetailScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            if (box != null) {
+            box?.let { b ->
                 Card(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("箱子规格: ${box.length_cm}x${box.width_cm}x${box.height_cm}cm")
-                        Text("整箱重量: ${box.weight_kg}kg")
+                        Text("箱子规格: ${b.length_cm}x${b.width_cm}x${b.height_cm}cm")
+                        Text("整箱重量: ${b.weight_kg}kg")
                     }
                 }
             }
 
             LazyColumn {
-                items(products) { product ->
+                items(products) { item ->
                     ListItem(
-                        headlineContent = { Text(product.name) },
-                        supportingContent = { Text("数量: ${product.quantity} | ${product.weight_g}g") },
-                        trailingContent = { Text("${product.length_cm}x${product.width_cm}x${product.height_cm}") }
+                        headlineContent = { Text(item.name) },
+                        supportingContent = { Text("数量: ${item.quantity} | ${item.weight_g}g") },
+                        trailingContent = { Text("${item.length_cm}x${item.width_cm}x${item.height_cm}") }
                     )
                 }
             }

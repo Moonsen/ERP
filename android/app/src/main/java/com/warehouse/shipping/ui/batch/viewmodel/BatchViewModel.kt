@@ -33,6 +33,8 @@ class BatchViewModel(private val repository: WarehouseRepository) : ViewModel() 
 
     // Boxes in a specific batch
     fun getBoxes(batchId: String): Flow<List<BoxEntity>> = repository.getBoxesByBatchId(batchId)
+    
+    suspend fun getBox(boxId: String): BoxEntity? = repository.getBoxById(boxId)
 
     fun addBox(batchId: String, l: Double, w: Double, h: Double, weight: Double) {
         viewModelScope.launch {

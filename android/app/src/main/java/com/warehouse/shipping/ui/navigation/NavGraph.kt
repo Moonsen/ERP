@@ -9,7 +9,6 @@ import com.warehouse.shipping.ui.batch.BatchListScreen
 import com.warehouse.shipping.ui.batch.BatchDetailScreen
 import com.warehouse.shipping.ui.batch.BoxDetailScreen
 import com.warehouse.shipping.ui.settings.DataManageScreen
-
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.warehouse.shipping.ui.inventory.InventoryListScreen

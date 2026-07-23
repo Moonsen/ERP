@@ -36,13 +36,13 @@ fun BatchListScreen(
         }
     ) { padding ->
         LazyColumn(modifier = Modifier.padding(padding)) {
-            items(batches) { batch ->
+            items(batches) { item ->
                 ListItem(
-                    headlineContent = { Text(batch.name) },
-                    supportingContent = { Text(batch.destination ?: "无目的地") },
-                    trailingContent = { Text(batch.created_at.take(10)) },
+                    headlineContent = { Text(item.name) },
+                    supportingContent = { Text(item.destination ?: "无目的地") },
+                    trailingContent = { Text(item.created_at.take(10)) },
                     modifier = Modifier.clickable { 
-                        navController.navigate(Screen.BatchDetail.createRoute(batch.id))
+                        navController.navigate(Screen.BatchDetail.createRoute(item.id))
                     }
                 )
             }

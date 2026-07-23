@@ -49,11 +49,19 @@ class BackupManager(private val db: AppDatabase, private val context: Context) {
                     db.query("DELETE FROM box", null).close()
                     db.query("DELETE FROM batch", null).close()
 
-                    // Batch insert everything
-                    data.batches.forEach { db.batchDao().insert(it) }
-                    data.boxes.forEach { db.boxDao().insert(it) }
-                    data.productInventory.forEach { db.productInventoryDao().insert(it) }
-                    data.boxProducts.forEach { db.boxProductDao().insert(it) }
+                    // Batch insert everything using loops (supports suspend calls)
+                    for (batch in data.batches) {
+                        db.batchDao().insert(batch)
+                    }
+                    for (box in data.boxes) {
+                        db.boxDao().insert(box)
+                    }
+                    for (inv in data.productInventory) {
+                        db.productInventoryDao().insert(inv)
+                    }
+                    for (prod in data.boxProducts) {
+                        db.boxProductDao().insert(prod)
+                    }
                 }
                 true
             } else false

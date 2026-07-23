@@ -6,6 +6,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BoxDao {
+    @Query("SELECT * FROM box WHERE id = :id")
+    suspend fun getById(id: String): BoxEntity?
+
     @Query("SELECT * FROM box WHERE batch_id = :batchId AND deleted_at IS NULL ORDER BY box_number ASC")
     fun getByBatchId(batchId: String): Flow<List<BoxEntity>>
 

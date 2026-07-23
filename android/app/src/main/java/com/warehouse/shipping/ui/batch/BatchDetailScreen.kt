@@ -25,7 +25,7 @@ fun BatchDetailScreen(
     viewModel: BatchViewModel
 ) {
     val batches by viewModel.batches.collectAsState(initial = emptyList())
-    val batch = batches.find { it.id == batchId }
+    val batch = batches.find { b -> b.id == batchId }
     val boxes by viewModel.getBoxes(batchId).collectAsState(initial = emptyList())
     
     var showAddBoxDialog by remember { mutableStateOf(false) }
@@ -58,12 +58,12 @@ fun BatchDetailScreen(
             }
 
             LazyColumn {
-                items(boxes) { box ->
+                items(boxes) { item ->
                     ListItem(
-                        headlineContent = { Text("第 ${box.box_number} 箱") },
-                        supportingContent = { Text("${box.length_cm}x${box.width_cm}x${box.height_cm}cm | ${box.weight_kg}kg") },
+                        headlineContent = { Text("第 ${item.box_number} 箱") },
+                        supportingContent = { Text("${item.length_cm}x${item.width_cm}x${item.height_cm}cm | ${item.weight_kg}kg") },
                         modifier = Modifier.clickable { 
-                            navController.navigate(Screen.BoxDetail.createRoute(box.id))
+                            navController.navigate(Screen.BoxDetail.createRoute(item.id))
                         }
                     )
                 }
