@@ -24,12 +24,8 @@ import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 
 class MainActivity : ComponentActivity() {
-    private val db by lazy {
-        Room.databaseBuilder(applicationContext, AppDatabase::class.java, "warehouse.db")
-            .fallbackToDestructiveMigration()
-            .build()
-    }
-    private val repository by lazy { WarehouseRepository(db) }
+    private lateinit var db: AppDatabase
+    private lateinit var repository: WarehouseRepository
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -42,12 +38,17 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
+        db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "warehouse.db")
+            .fallbackToDestructiveMigration()
+            .build()
+        repository = WarehouseRepository(db)
+
         // Request Camera Permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             requestPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
         
-        // Manual Factory (In real app use Hilt)
+        // Manual Factory
         val factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return when {
@@ -55,7 +56,7 @@ class MainActivity : ComponentActivity() {
                     modelClass.isAssignableFrom(InventoryEditViewModel::class.java) -> InventoryEditViewModel(repository) as T
                     modelClass.isAssignableFrom(BatchViewModel::class.java) -> BatchViewModel(repository) as T
                     modelClass.isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(repository, db, applicationContext) as T
-                    else -> throw IllegalArgumentException("Unknown ViewModel")
+                    else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
                 }
             }
         }

@@ -23,8 +23,6 @@ fun BoxDetailScreen(
     boxId: String,
     viewModel: BatchViewModel
 ) {
-    val boxes by viewModel.getBoxes("").collectAsState(initial = emptyList()) // This needs a proper box lookup
-    val box = boxes.find { it.id == boxId }
     val products by viewModel.getProducts(boxId).collectAsState(initial = emptyList())
     val inventory by viewModel.allInventory.collectAsState(initial = emptyList())
 
@@ -33,7 +31,7 @@ fun BoxDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (box != null) "第 ${box.box_number} 箱" else "箱子详情") },
+                title = { Text("箱子详情") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")

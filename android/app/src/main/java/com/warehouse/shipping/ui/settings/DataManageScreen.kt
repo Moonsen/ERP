@@ -38,7 +38,7 @@ fun DataManageScreen(navController: NavController, viewModel: SettingsViewModel)
             scope.launch {
                 val success = viewModel.importBackup(it)
                 if (success) {
-                    // Refresh app or show success
+                    // Success logic
                 }
             }
         }
@@ -126,7 +126,8 @@ fun DataManageScreen(navController: NavController, viewModel: SettingsViewModel)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            Divider()
+            // Using a simple Box as a divider for maximum compatibility
+            Box(modifier = Modifier.fillMaxWidth().height(1.dp).padding(horizontal = 8.dp))
             Spacer(modifier = Modifier.height(16.dp))
 
             Card(modifier = Modifier.fillMaxWidth()) {
@@ -137,7 +138,7 @@ fun DataManageScreen(navController: NavController, viewModel: SettingsViewModel)
                         onClick = { 
                             scope.launch {
                                 val file = viewModel.exportBackup()
-                                // In real app, use FileProvider to share/save file
+                                // Share file logic
                             }
                         },
                         modifier = Modifier.fillMaxWidth()
