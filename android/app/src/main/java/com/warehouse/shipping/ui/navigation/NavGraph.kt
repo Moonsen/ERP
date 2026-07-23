@@ -17,6 +17,7 @@ import com.warehouse.shipping.ui.batch.BoxDetailScreen
 import com.warehouse.shipping.ui.batch.viewmodel.BatchViewModel
 import com.warehouse.shipping.ui.settings.DataManageScreen
 import com.warehouse.shipping.ui.settings.SettingsViewModel
+import com.warehouse.shipping.ui.scan.BarcodeScannerScreen
 
 sealed class Screen(val route: String) {
     object InventoryList : Screen("inventory_list")
@@ -30,6 +31,7 @@ sealed class Screen(val route: String) {
     object BoxDetail : Screen("box_detail/{id}") {
         fun createRoute(id: String) = "box_detail/$id"
     }
+    object Scanner : Screen("scanner")
     object Settings : Screen("settings")
 }
 
@@ -66,6 +68,12 @@ fun NavGraph(
             val id = backStackEntry.arguments?.getString("id")
             val vm: BatchViewModel = viewModel(factory = factory)
             BoxDetailScreen(navController, id ?: "", vm)
+        }
+        composable(Screen.Scanner.route) {
+            BarcodeScannerScreen(navController) { barcode ->
+                navController.previousBackStackEntry?.savedStateHandle?.set("scan_result", barcode)
+                navController.popBackStack()
+            }
         }
         composable(Screen.Settings.route) {
             val vm: SettingsViewModel = viewModel(factory = factory)

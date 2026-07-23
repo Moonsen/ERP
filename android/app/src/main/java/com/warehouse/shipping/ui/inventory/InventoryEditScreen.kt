@@ -7,12 +7,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.warehouse.shipping.ui.navigation.Screen
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
@@ -37,8 +39,26 @@ fun InventoryEditScreen(
     var height by remember { mutableStateOf("") }
     var weight by remember { mutableStateOf("") }
     
-    // Dynamic Custom Specs
     var customSpecs by remember { mutableStateOf(mutableListOf<CustomSpec>()) }
+
+    // Listen for scan result
+    val scanResult = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getLiveData<String>("scan_result")
+        ?.observeAsState()
+
+    var lastTarget by remember { mutableStateOf("") } // Track which field we are scanning for
+
+    LaunchedEffect(scanResult?.value) {
+        scanResult?.value?.let { result ->
+            if (lastTarget == "barcode") {
+                barcode = result
+            } else if (lastTarget == "code") {
+                code = result
+            }
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("scan_result")
+        }
+    }
 
     LaunchedEffect(id) {
         viewModel.loadProduct(id)
@@ -54,7 +74,6 @@ fun InventoryEditScreen(
             height = it.height_cm.toString()
             weight = it.weight_g.toString()
             
-            // Parse existing JSON specs
             try {
                 it.custom_specs?.let { json ->
                     customSpecs = Json.decodeFromString<List<CustomSpec>>(json).toMutableList()
@@ -76,7 +95,6 @@ fun InventoryEditScreen(
                 },
                 actions = {
                     IconButton(onClick = { 
-                        // Stringify custom specs before saving
                         val specsJson = if (customSpecs.isEmpty()) null else Json.encodeToString(customSpecs)
                         viewModel.saveProduct(
                             id, name, code, barcode,
@@ -101,11 +119,44 @@ fun InventoryEditScreen(
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("产品名称 *") }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(
+                value = name, 
+                onValueChange = { name = it }, 
+                label = { Text("产品名称 *") }, 
+                modifier = Modifier.fillMaxWidth()
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(value = code, onValueChange = { code = it }, label = { Text("产品编码") }, modifier = Modifier.fillMaxWidth())
+            
+            OutlinedTextField(
+                value = code, 
+                onValueChange = { code = it }, 
+                label = { Text("产品编码") }, 
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    IconButton(onClick = { 
+                        lastTarget = "code"
+                        navController.navigate(Screen.Scanner.route) 
+                    }) {
+                        Icon(Icons.Default.PhotoCamera, contentDescription = "Scan Code")
+                    }
+                }
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(value = barcode, onValueChange = { barcode = it }, label = { Text("条形码") }, modifier = Modifier.fillMaxWidth())
+            
+            OutlinedTextField(
+                value = barcode, 
+                onValueChange = { barcode = it }, 
+                label = { Text("条形码") }, 
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    IconButton(onClick = { 
+                        lastTarget = "barcode"
+                        navController.navigate(Screen.Scanner.route) 
+                    }) {
+                        Icon(Icons.Default.PhotoCamera, contentDescription = "Scan Barcode")
+                    }
+                }
+            )
             
             Spacer(modifier = Modifier.height(16.dp))
             Text("尺寸与重量", style = MaterialTheme.typography.titleMedium)

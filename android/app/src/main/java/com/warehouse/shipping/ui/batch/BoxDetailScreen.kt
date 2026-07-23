@@ -20,6 +20,7 @@ import com.warehouse.shipping.data.local.entity.BoxProductEntity
 import com.warehouse.shipping.ui.batch.viewmodel.BatchViewModel
 import com.warehouse.shipping.ui.components.ClickToCopyText
 import com.warehouse.shipping.ui.product.ProductPickerDialog
+import com.warehouse.shipping.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,6 +41,23 @@ fun BoxDetailScreen(
     var editingProduct by remember { mutableStateOf<BoxProductEntity?>(null) }
     var showEditDialog by remember { mutableStateOf(false) }
     
+    // Listen for scan result from NavController
+    val scanResult = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getLiveData<String>("scan_result")
+        ?.observeAsState()
+
+    var lastScanTarget by remember { mutableStateOf("") }
+    var scannedBarcode by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(scanResult?.value) {
+        scanResult?.value?.let { result ->
+            scannedBarcode = result
+            showPickerDialog = true // Re-open dialog on return
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("scan_result")
+        }
+    }
+
     // Edit Fields
     var eName by remember { mutableStateOf("") }
     var eQty by remember { mutableStateOf("1") }
@@ -63,7 +81,10 @@ fun BoxDetailScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { showPickerDialog = true }) {
+            FloatingActionButton(onClick = { 
+                scannedBarcode = null
+                showPickerDialog = true 
+            }) {
                 Icon(Icons.Default.Add, contentDescription = "Add Product")
             }
         }
@@ -147,6 +168,8 @@ fun BoxDetailScreen(
         if (showPickerDialog) {
             ProductPickerDialog(
                 inventory = inventory,
+                initialBarcode = scannedBarcode,
+                initialTab = if (scannedBarcode != null) 1 else 0,
                 onDismiss = { showPickerDialog = false },
                 onProductSelected = { selected, qty ->
                     viewModel.addProduct(boxId, selected, selected.name, selected.barcode, 
@@ -156,6 +179,10 @@ fun BoxDetailScreen(
                 onManualInput = { name, barcode, l, w, h, weight, qty ->
                     viewModel.addProduct(boxId, null, name, barcode, l, w, h, weight, qty)
                     showPickerDialog = false
+                },
+                onScanRequest = { target ->
+                    lastScanTarget = target
+                    navController.navigate(Screen.Scanner.route)
                 }
             )
         }

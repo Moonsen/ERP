@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -14,20 +15,30 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.warehouse.shipping.data.local.entity.ProductInventoryEntity
 import com.warehouse.shipping.ui.navigation.Screen
-
+import com.warehouse.shipping.ui.components.ClickToCopyText
 import androidx.compose.ui.res.painterResource
 import com.warehouse.shipping.R
-
-import com.warehouse.shipping.ui.components.ClickToCopyText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InventoryListScreen(
     navController: NavController,
-    viewModel: InventoryListViewModel // Assume ViewModel is provided
+    viewModel: InventoryListViewModel
 ) {
     val products by viewModel.products.collectAsState(initial = emptyList())
     var searchQuery by remember { mutableStateOf("") }
+
+    val scanResult = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getLiveData<String>("scan_result")
+        ?.observeAsState()
+
+    LaunchedEffect(scanResult?.value) {
+        scanResult?.value?.let { result ->
+            searchQuery = result
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("scan_result")
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -59,12 +70,21 @@ fun InventoryListScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                placeholder = { Text("搜索产品...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) }
+                placeholder = { Text("搜索产品名称/编码/条码") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                trailingIcon = {
+                    IconButton(onClick = { navController.navigate(Screen.Scanner.route) }) {
+                        Icon(Icons.Default.PhotoCamera, contentDescription = "Scan")
+                    }
+                }
             )
 
             LazyColumn {
-                items(products.filter { it.name.contains(searchQuery, ignoreCase = true) || it.barcode?.contains(searchQuery) == true }) { product ->
+                items(products.filter { 
+                    it.name.contains(searchQuery, true) || 
+                    it.barcode?.contains(searchQuery) == true ||
+                    it.product_code?.contains(searchQuery) == true
+                }) { product ->
                     ProductItem(product) {
                         navController.navigate(Screen.InventoryEdit.createRoute(product.id))
                     }

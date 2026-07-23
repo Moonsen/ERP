@@ -21,20 +21,30 @@ fun ProductPickerDialog(
     onDismiss: () -> Unit,
     onProductSelected: (ProductInventoryEntity, Int) -> Unit,
     onManualInput: (String, String?, Double, Double, Double, Double, Int) -> Unit,
-    onScanRequest: () -> Unit = {} // Added Scan Request
+    onScanRequest: (targetField: String) -> Unit = {},
+    initialBarcode: String? = null,
+    initialTab: Int = 0
 ) {
-    var activeTab by remember { mutableStateOf(0) } // 0: Select, 1: Manual
+    var activeTab by remember { mutableStateOf(initialTab) } // 0: Select, 1: Manual
     var searchQuery by remember { mutableStateOf("") }
     var selectedProduct by remember { mutableStateOf<ProductInventoryEntity?>(null) }
     var quantity by remember { mutableStateOf("1") }
 
     // Manual Input States
     var mName by remember { mutableStateOf("") }
-    var mBarcode by remember { mutableStateOf("") }
+    var mBarcode by remember { mutableStateOf(initialBarcode ?: "") }
     var mLength by remember { mutableStateOf("") }
     var mWidth by remember { mutableStateOf("") }
     var mHeight by remember { mutableStateOf("") }
     var mWeightG by remember { mutableStateOf("") }
+
+    // Update barcode if initialBarcode changes (from scan)
+    LaunchedEffect(initialBarcode) {
+        if (initialBarcode != null) {
+            mBarcode = initialBarcode
+            searchQuery = initialBarcode
+        }
+    }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -62,16 +72,19 @@ fun ProductPickerDialog(
                         onValueChange = { searchQuery = it },
                         placeholder = { Text("搜索产品...") },
                         trailingIcon = { 
-                            IconButton(onClick = onScanRequest) { 
+                            IconButton(onClick = { onScanRequest("search") }) { 
                                 Icon(Icons.Default.PhotoCamera, contentDescription = "Scan") 
                             }
                         },
                         modifier = Modifier.fillMaxWidth()
                     )
                     LazyColumn(modifier = Modifier.weight(1f)) {
-                        items(inventory.filter { it.name.contains(searchQuery, true) }) { product ->
+                        items(inventory.filter { 
+                            it.name.contains(searchQuery, true) || it.barcode?.contains(searchQuery) == true 
+                        }) { product ->
                             ListItem(
                                 headlineContent = { Text(product.name) },
+                                supportingContent = { Text(product.barcode ?: "无条码") },
                                 modifier = Modifier.clickable { selectedProduct = product }
                             )
                         }
@@ -87,7 +100,17 @@ fun ProductPickerDialog(
                     // Manual Mode
                     Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())) {
                         OutlinedTextField(value = mName, onValueChange = { mName = it }, label = { Text("名称 *") }, modifier = Modifier.fillMaxWidth())
-                        OutlinedTextField(value = mBarcode, onValueChange = { mBarcode = it }, label = { Text("条形码") }, modifier = Modifier.fillMaxWidth())
+                        OutlinedTextField(
+                            value = mBarcode, 
+                            onValueChange = { mBarcode = it }, 
+                            label = { Text("条形码") }, 
+                            modifier = Modifier.fillMaxWidth(),
+                            trailingIcon = {
+                                IconButton(onClick = { onScanRequest("manual_barcode") }) {
+                                    Icon(Icons.Default.PhotoCamera, contentDescription = "Scan")
+                                }
+                            }
+                        )
                         Row {
                             OutlinedTextField(value = mLength, onValueChange = { mLength = it }, label = { Text("长") }, modifier = Modifier.weight(1f))
                             OutlinedTextField(value = mWidth, onValueChange = { mWidth = it }, label = { Text("宽") }, modifier = Modifier.weight(1f))
@@ -105,6 +128,10 @@ fun ProductPickerDialog(
                             Text("添加并存入产品库")
                         }
                     }
+                }
+                
+                TextButton(onClick = onDismiss, modifier = Modifier.align(androidx.compose.ui.Alignment.End)) {
+                    Text("取消")
                 }
             }
         }
