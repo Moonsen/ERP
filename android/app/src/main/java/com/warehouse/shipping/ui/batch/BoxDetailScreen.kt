@@ -33,32 +33,28 @@ fun BoxDetailScreen(
     val products by viewModel.getProducts(boxId).collectAsState(initial = emptyList())
     val inventory by viewModel.allInventory.collectAsState(initial = emptyList())
 
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    val scanResult by savedStateHandle?.getStateFlow<String?>("scan_result", null)?.collectAsState() ?: remember { mutableStateOf(null) }
+
+    var lastScanTarget by remember { mutableStateOf("") }
+    var scannedBarcode by remember { mutableStateOf<String?>(null) }
+    var showPickerDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(scanResult) {
+        scanResult?.let { result ->
+            scannedBarcode = result
+            showPickerDialog = true
+            savedStateHandle?.set("scan_result", null)
+        }
+    }
+
     LaunchedEffect(boxId) {
         currentBox = viewModel.getBox(boxId)
     }
 
-    var showPickerDialog by remember { mutableStateOf(false) }
     var editingProduct by remember { mutableStateOf<BoxProductEntity?>(null) }
     var showEditDialog by remember { mutableStateOf(false) }
-    
-    // Listen for scan result from NavController
-    val scanResult = navController.currentBackStackEntry
-        ?.savedStateHandle
-        ?.getLiveData<String>("scan_result")
-        ?.observeAsState()
 
-    var lastScanTarget by remember { mutableStateOf("") }
-    var scannedBarcode by remember { mutableStateOf<String?>(null) }
-
-    LaunchedEffect(scanResult?.value) {
-        scanResult?.value?.let { result ->
-            scannedBarcode = result
-            showPickerDialog = true // Re-open dialog on return
-            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("scan_result")
-        }
-    }
-
-    // Edit Fields
     var eName by remember { mutableStateOf("") }
     var eQty by remember { mutableStateOf("1") }
     var eL by remember { mutableStateOf("") }

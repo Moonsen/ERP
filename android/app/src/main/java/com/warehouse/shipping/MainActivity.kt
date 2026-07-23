@@ -13,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -65,7 +66,7 @@ class MainActivity : ComponentActivity() {
                     modelClass.isAssignableFrom(InventoryEditViewModel::class.java) -> InventoryEditViewModel(repository) as T
                     modelClass.isAssignableFrom(BatchViewModel::class.java) -> BatchViewModel(repository) as T
                     modelClass.isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(repository, db, applicationContext) as T
-                    else -> throw IllegalArgumentException("Unknown ViewModel")
+                    else -> throw IllegalArgumentException("Unknown ViewModel: ${modelClass.name}")
                 }
             }
         }

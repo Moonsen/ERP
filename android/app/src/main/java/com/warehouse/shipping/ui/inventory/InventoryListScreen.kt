@@ -30,15 +30,13 @@ fun InventoryListScreen(
     val products by viewModel.products.collectAsState(initial = emptyList())
     var searchQuery by remember { mutableStateOf("") }
 
-    val scanResult = navController.currentBackStackEntry
-        ?.savedStateHandle
-        ?.getLiveData<String>("scan_result")
-        ?.observeAsState()
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    val scanResult by savedStateHandle?.getStateFlow<String?>("scan_result", null)?.collectAsState() ?: remember { mutableStateOf(null) }
 
-    LaunchedEffect(scanResult?.value) {
-        scanResult?.value?.let { result ->
+    LaunchedEffect(scanResult) {
+        scanResult?.let { result ->
             searchQuery = result
-            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("scan_result")
+            savedStateHandle?.set("scan_result", null)
         }
     }
 

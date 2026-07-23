@@ -42,21 +42,19 @@ fun InventoryEditScreen(
     var customSpecs by remember { mutableStateOf(mutableListOf<CustomSpec>()) }
 
     // Listen for scan result
-    val scanResult = navController.currentBackStackEntry
-        ?.savedStateHandle
-        ?.getLiveData<String>("scan_result")
-        ?.observeAsState()
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    val scanResult by savedStateHandle?.getStateFlow<String?>("scan_result", null)?.collectAsState() ?: remember { mutableStateOf(null) }
 
     var lastTarget by remember { mutableStateOf("") } // Track which field we are scanning for
 
-    LaunchedEffect(scanResult?.value) {
-        scanResult?.value?.let { result ->
+    LaunchedEffect(scanResult) {
+        scanResult?.let { result ->
             if (lastTarget == "barcode") {
                 barcode = result
             } else if (lastTarget == "code") {
                 code = result
             }
-            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("scan_result")
+            savedStateHandle?.set("scan_result", null)
         }
     }
 
